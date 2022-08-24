@@ -1,0 +1,22 @@
+package servlets.ajaxServlets;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.annotation.*;
+import java.io.IOException;
+
+@WebServlet(name = "ResetError", value = "/ResetError")
+public class ResetError extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getSession().removeAttribute("showtimeError");
+        request.getSession().removeAttribute("filmError");
+        request.getSession().removeAttribute("loginError");
+        request.getSession().removeAttribute("registerError");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    }
+}
