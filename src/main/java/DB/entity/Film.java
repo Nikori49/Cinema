@@ -1,5 +1,24 @@
 package DB.entity;
 
+/**
+ * Represents entry from DB table <code>films</code> .
+ * <p>
+ * Has the following fields:
+ * <ul>
+ *     <li><code>Long id</code></li>
+ *     <li><code>String name</code></li>
+ *     <li><code>String description</code></li>
+ *     <li><code>String genre</code></li>
+ *     <li><code>String posterImgPath</code>: relative path to poster image saved in <code>posterImages</code> package</li>
+ *     <li><code>Long runningTime</code>: specified in minutes</li>
+ *     <li><code>String youtubeTrailerId</code>: YouTube id of the films trailer</li>
+ * </ul>
+ * Setter and getter methods are provided.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ * @see DB.DBManager
+ */
 public class Film {
     Long id;
     String name;
@@ -8,6 +27,7 @@ public class Film {
     String posterImgPath;
     String director;
     Long runningTime;
+    String youtubeTrailerId;
 
     public Film() {
     }
@@ -66,5 +86,13 @@ public class Film {
 
     public void setRunningTime(Long runningTime) {
         this.runningTime = runningTime;
+    }
+
+    public String getYoutubeTrailerId() {
+        return youtubeTrailerId;
+    }
+
+    public void setYoutubeTrailerId(String youtubeTrailerId) {
+        this.youtubeTrailerId = youtubeTrailerId;
     }
 }

@@ -15,6 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Servlet that executes commands and logs this process.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ */
 @WebServlet("/controller")
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024, // 1 MB
@@ -27,7 +33,7 @@ public class Controller extends HttpServlet {
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 
-            req.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding("UTF-8");
 
         String address = "error.jsp";
         String commandName = req.getParameter("command");
@@ -43,7 +49,7 @@ public class Controller extends HttpServlet {
         User user = (User) req.getSession().getAttribute("loggedUser");
 
         logger.info("commandName ==> " + commandName);
-        if(user!=null){
+        if (user != null) {
             logger.info("loggedUser ==> " + user.getLogin());
         }
         logger.info("command ==> " + command);
@@ -54,15 +60,13 @@ public class Controller extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-            req.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding("UTF-8");
 
         String address = "error.jsp";
         String commandName = req.getParameter("command");
         logger.info("commandName ==> " + commandName);
 
         Command command = CommandContainer.getCommand(commandName);
-
-
 
 
         try {

@@ -1,5 +1,25 @@
 package DB.entity;
 
+/**
+ * Represents entry from DB table <code>users</code> .
+ * <p>
+ * Has the following fields:
+ * <ul>
+ *     <li><code>Long id</code></li>
+ *     <li><code>String email</code></li>
+ *     <li><code>String phoneNumber</code></li>
+ *     <li><code>String name</code></li>
+ *     <li><code>String surname</code></li>
+ *     <li><code>String login</code></li>
+ *     <li><code>String password</code></li>
+ *     <li><code>String role</code></li>
+ * </ul>
+ * Setter and getter methods are provided.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ * @see DB.DBManager
+ */
 public class User {
     Long id;
     String email;

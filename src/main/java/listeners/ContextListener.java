@@ -8,11 +8,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-
+/**
+ * Listener that upon Servlet Context initialization sets it required attributes.
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ */
 @WebListener
 public class ContextListener implements ServletContextListener{
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
+        DBManager.getInstance().updatePastShowtimeStatuses();
 
         ServletContext servletContext = servletContextEvent.getServletContext();
 

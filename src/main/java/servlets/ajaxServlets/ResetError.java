@@ -5,6 +5,12 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 
+/**
+ * AJAX Servlet that removes error attributes from Session.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ */
 @WebServlet(name = "ResetError", value = "/ResetError")
 public class ResetError extends HttpServlet {
     @Override

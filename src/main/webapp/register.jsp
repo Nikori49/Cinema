@@ -229,10 +229,6 @@
             <li><a href="films.jsp"><fmt:message key="label.films"/></a></li>
             <li><a href="schedule.jsp"><fmt:message key="label.schedule"/></a></li>
             <%--@elvariable id="loggedUser" type="DB.entity.User"--%>
-            <c:if test="${loggedUser.role=='manager'}">
-                <li><a href="manager.jsp"><fmt:message key="label.managerWorkplace"/></a></li>
-            </c:if>
-
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <tg:changeLanguage/>

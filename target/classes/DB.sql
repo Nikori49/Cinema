@@ -13,30 +13,38 @@ CREATE TABLE USERS
     password     VARCHAR(60) NOT NULL,
     role         VARCHAR(15) NOT NULL
 );
-CREATE TABLE FILMS
-(
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name          VARCHAR(70)  NOT NULL UNIQUE,
-    description   VARCHAR(2000),
-    genre         VARCHAR(50)  NOT NULL,
-    posterImgPath VARCHAR(200) NOT NULL,
-    director      VARCHAR(30)  NOT NULL,
-    runningTime   BIGINT       NOT NULL
-);
 CREATE TABLE SHOW_TIMES
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
     filmId       BIGINT NOT NULL REFERENCES FILMS (id),
-    date         DATE NOT NULL,
+    date         DATE   NOT NULL,
     status       VARCHAR(30),
     startTime    TIME,
-    endTime      TIME,
-    seatsTableId BIGINT NOT NULL
+    endTime      TIME
 );
+CREATE TABLE FILMS
+(
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name             VARCHAR(70)  NOT NULL UNIQUE,
+    description      VARCHAR(2000),
+    genre            VARCHAR(50)  NOT NULL,
+    posterImgPath    VARCHAR(200) NOT NULL,
+    director         VARCHAR(30)  NOT NULL,
+    runningTime      BIGINT       NOT NULL,
+    youtubeTrailerId VARCHAR(20)  NOT NULL
+);
+
 CREATE TABLE TICKETS
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     userId     BIGINT NOT NULL REFERENCES USERS (id),
     showTimeId BIGINT NOT NULL REFERENCES SHOW_TIMES (id),
     seat       VARCHAR(20)
+);
+CREATE TABLE SEATS
+(
+   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+   showtimeId BIGINT NOT NULL REFERENCES SHOW_TIMES(id),
+   seat VARCHAR(10),
+   status VARCHAR(30)
 );

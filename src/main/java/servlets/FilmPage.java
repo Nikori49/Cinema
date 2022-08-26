@@ -13,6 +13,12 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * Servlet that constructs film page based on provided film id.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ */
 @WebServlet(name = "FilmPage", value = "/FilmPage")
 public class FilmPage extends HttpServlet {
     @Override
@@ -30,7 +36,7 @@ public class FilmPage extends HttpServlet {
             userRole = user.getRole();
         }
         String language = (String) request.getSession().getAttribute("language");
-        if (language==null) {
+        if (language == null) {
             language = "en";
         }
         Locale locale = new Locale(language);
@@ -40,10 +46,9 @@ public class FilmPage extends HttpServlet {
             return;
         }
         Film film = DBManager.getInstance().getFilm(Long.valueOf(filmId));
-        System.out.println(film.getName());
 
 
-        if (film.getId()==null) {
+        if (film.getId() == null) {
             response.sendRedirect("films.jsp");
             return;
         }
@@ -91,71 +96,81 @@ public class FilmPage extends HttpServlet {
                 "            <li class=\"active\"><a href=\"films.jsp\">" + resourceBundle.getString("label.films") + "</a></li>\n" +
                 "            <li><a href=\"schedule.jsp\">" + resourceBundle.getString("label.schedule") + "</a></li>\n");
         if (Objects.equals(userRole, "manager")) {
-            out.write("<li><a href=\"manager.jsp\">"+resourceBundle.getString("label.managerWorkplace")+"</a></li>\n");
+            out.write("<li><a href=\"manager.jsp\">" + resourceBundle.getString("label.managerWorkplace") + "</a></li>\n");
         }
         out.write("</ul>\n");
         out.write("<ul class=\"nav navbar-nav navbar-right\">\n");
         out.write("<li ");
-        if (language.equals("en")){
+        if (language.equals("en")) {
             out.write("class=\"active\" ");
         }
         out.write("> <a href=\"#\" onclick=\"changeLanguage('en')\" >En</a></li>\n" +
                 "<li ");
-        if (language.equals("uk")){
+        if (language.equals("uk")) {
             out.write("class=\"active\" ");
         }
         out.write("> <a href=\"#\" onclick=\"changeLanguage('uk')\" >Укр</a></li>");
         if (Objects.equals(userRole, "guest")) {
-            out.write("<li><a href=\"register.jsp\"><span class=\"glyphicon glyphicon-user\"></span>"+resourceBundle.getString("label.signUp")+"</a></li>\n" +
-                    "<li><a href=\"login.jsp\"><span class=\"glyphicon glyphicon-log-in\"></span>"+resourceBundle.getString("label.logIn")+"</a></li>\n");
+            out.write("<li><a href=\"register.jsp\"><span class=\"glyphicon glyphicon-user\"></span>" + resourceBundle.getString("label.signUp") + "</a></li>\n" +
+                    "<li><a href=\"login.jsp\"><span class=\"glyphicon glyphicon-log-in\"></span>" + resourceBundle.getString("label.logIn") + "</a></li>\n");
         }
-        if (!Objects.equals(userRole, "guest")){
+        if (!Objects.equals(userRole, "guest")) {
             out.write("<li>\n" +
-                    "                    <a href=\""+request.getContextPath()+"/LogOut\" >\n" +
-                    "                        <span class=\"glyphicon glyphicon glyphicon-log-out\"></span>"+resourceBundle.getString("label.logOut")+"\n" +
+                    "                    <a href=\"" + request.getContextPath() + "/LogOut\" >\n" +
+                    "                        <span class=\"glyphicon glyphicon glyphicon-log-out\"></span>"
+                    + resourceBundle.getString("label.logOut") + "\n" +
                     "                    </a>\n" +
                     "                </li>");
         }
         if (Objects.equals(userRole, "client")) {
-            out.write("                <li><a href=\"client.jsp\"><span class=\"glyphicon glyphicon-user\"></span>"+resourceBundle.getString("label.profile")+"</a></li>\n");
+            out.write("                <li><a href=\"client.jsp\"><span class=\"glyphicon glyphicon-user\"></span>"
+                    + resourceBundle.getString("label.profile") + "</a></li>\n");
         }
         if (Objects.equals(userRole, "manager")) {
-            out.write("                <li><a href=\"manager.jsp\"><span class=\" glyphicon glyphicon-briefcase\"></span>"+resourceBundle.getString("label.managerWorkplace")+"</a></li>\n");
+            out.write("                <li><a href=\"manager.jsp\"><span class=\" glyphicon glyphicon-briefcase\"></span>"
+                    + resourceBundle.getString("label.managerWorkplace") + "</a></li>\n");
         }
         out.write("</ul>\n" +
                 "</div>\n" +
                 "</nav>");
+        out.write("<div style=\"width: 720px; height: 405px; position: absolute; top: 10%; right: 10%\"  class=\"container\">\n" +
+                "    <h2>" + resourceBundle.getString("label.trailer") + "</h2>\n" +
+                "    <div class=\"embed-responsive embed-responsive-16by9\">\n" +
+                "        <iframe  class=\"embed-responsive\" src=\"https://www.youtube.com/embed/" + film.getYoutubeTrailerId() + "\"></iframe>\n" +
+                "    </div>\n" +
+                "</div>");
         out.write("<div class=\"container\">\n" +
-                "    <img width=\"400\" height=\"600\" class=\"img-responsive\" alt=\"Missing poster\" src=\""+film.getPosterImgPath()+"\">\n" +
-                "    <h3>"+film.getName()+"</h3>\n" +
+                "    <img width=\"400\" height=\"600\" class=\"img-responsive\" alt=\"Missing poster\" src=\"" + film.getPosterImgPath() + "\">\n" +
+                "    <h3>" + film.getName() + "</h3>\n" +
                 "    <div class=\"container\">\n" +
-                "        <h5>"+resourceBundle.getString("label.director")+"</h5>\n" +
-                "        <div class=\"well\">"+film.getDirector()+"</div>\n" +
+                "        <h5>" + resourceBundle.getString("label.director") + "</h5>\n" +
+                "        <div class=\"well\">" + film.getDirector() + "</div>\n" +
                 "    </div>\n" +
                 "    <div class=\"container\">\n" +
-                "        <h5>"+resourceBundle.getString("label.genre")+"</h5>\n" +
-                "        <div class=\"well\">"+film.getGenre()+"</div>\n" +
+                "        <h5>" + resourceBundle.getString("label.genre") + "</h5>\n" +
+                "        <div class=\"well\">" + film.getGenre() + "</div>\n" +
                 "    </div>\n" +
                 "    <div class=\"container\">\n" +
-                "        <h5>"+resourceBundle.getString("label.runtime")+"</h5>\n" +
-                "        <div class=\"well\">"+film.getRunningTime()+"</div>\n" +
+                "        <h5>" + resourceBundle.getString("label.runtime") + "</h5>\n" +
+                "        <div class=\"well\">" + film.getRunningTime() + "</div>\n" +
                 "    </div>\n" +
                 "    <div class=\"container\">\n" +
-                "        <h5>"+resourceBundle.getString("label.description")+"</h5>\n" +
-                "        <div class=\"well\">"+film.getDescription()+"</div>\n" +
+                "        <h5>" + resourceBundle.getString("label.description") + "</h5>\n" +
+                "        <div class=\"well\">" + film.getDescription() + "</div>\n" +
                 "    </div>\n" +
                 "</div>");
         List<Showtime> showtimeList = DBManager.getInstance().getShowtimeForFilm(film.getId());
-        if (!showtimeList.isEmpty()){
+        if (!showtimeList.isEmpty()) {
             showtimeList.removeIf(showtime -> Objects.equals(showtime.getStatus(), "finished") || Objects.equals(showtime.getStatus(), "canceled"));
-            if(!showtimeList.isEmpty()){
+            if (!showtimeList.isEmpty()) {
                 showtimeList.sort(Comparator.comparing(Showtime::getDate));
                 out.write("<div class=\"container\">");
-                out.write("<label for=\"showtime\">"+resourceBundle.getString("label.availableShowtimes")+"</label>");
+                out.write("<label for=\"showtime\">" + resourceBundle.getString("label.availableShowtimes") + "</label>");
                 out.write("<form id=\"showtime\" role=\"presentation\">\n");
-                for (Showtime s:showtimeList) {
-                    System.out.println(s.getId());
-                    out.write("<button class=\"btn btn-block btn-info\" formmethod=\"get\" formaction=\""+contextPath+"/ShowtimePage\" name=\"id\" value=\""+s.getId().toString()+"\">"+s.getDate()+"  "+s.getStartTime()+"-"+s.getEndTime()+"</button>\n");
+                for (Showtime s : showtimeList) {
+                    out.write("<button class=\"btn btn-block btn-info\" formmethod=\"get\" formaction=\""
+                            + contextPath + "/ShowtimePage\" name=\"id\" value=\"" + s.getId().toString() + "\">"
+                            + s.getDate() + "  " + s.getStartTime() + "-" + s.getEndTime() + "</button>\n");
                 }
                 out.write("</form>");
                 out.write("</div>");

@@ -5,6 +5,12 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 
+/**
+ * Servlet that invalidates user session upon call.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ */
 @WebServlet(name = "LogOut", value = "/LogOut")
 public class LogOut extends HttpServlet {
     @Override

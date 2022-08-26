@@ -1,12 +1,25 @@
 package DB;
 
+import DB.entity.User;
+
 import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Class housing a few utility methods.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ */
 public class Utils {
-
+    /**
+     * Returns TreeMap object with keys from A1 to J24 and value "vacant".
+     *
+     * @return <code>TreeMap</code> object
+     * @see TreeMap
+     */
     public static TreeMap<String, String> fillSeatMap() {
         TreeMap<String, String> seatMap = new TreeMap<>();
 
@@ -19,6 +32,12 @@ public class Utils {
         return seatMap;
     }
 
+    /**
+     * Returns <code>List</code> of date objects for the current week.
+     *
+     * @return <code>List</code> object
+     * @see LocalDate,Date
+     */
     public static List<Date> getWeekDates() {
         List<Date> dateList = new ArrayList<>();
         LocalDate localDate = LocalDate.now();
@@ -31,10 +50,16 @@ public class Utils {
         return dateList;
     }
 
-    public static List<String> getWeekDays(){
+    /**
+     * Returns <code>List</code> of String object representing weekday indexes.
+     *
+     * @return <code>List</code> object
+     * @see User,DBManager
+     */
+    public static List<String> getWeekDays() {
         List<Date> dateList = getWeekDates();
         List<String> weekDays = new ArrayList<>();
-        for (Date d:dateList) {
+        for (Date d : dateList) {
             DayOfWeek day = d.toLocalDate().getDayOfWeek();
             weekDays.add(String.valueOf(day.getValue()));
         }

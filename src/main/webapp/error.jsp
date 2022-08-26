@@ -38,7 +38,7 @@
 
     </script>
 
-    <title><fmt:message key="label.mainTitle"/></title>
+    <title><fmt:message key="label.error"/></title>
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -93,44 +93,7 @@
     </div>
 </nav>
 
-<br/>
-
-
-<div class="container" style="position: absolute;top: 10%; left: 39%; width: 30%">
-    <h1><fmt:message key="label.currentlyShowing"/></h1>
-</div>
-
-<div id="myCarousel" style="position: absolute;top: 17%; left: 40%; width: 300px" class="carousel slide" data-interval="1500"
-     data-ride="carousel">
-    <div class="carousel-inner" role="listbox">
-        <c:forEach items="${filmList}" var="film" varStatus="status">
-            <div class="item <c:if test="${status.first}">active</c:if>">
-                <a href="${pageContext.request.contextPath }/FilmPage?id=${film.id}">
-                    <div class="preview">
-                        <img id="poster" class="img-responsive" alt="Missing poster" title="${film.name}" width="200"
-                             height="300" src="${film.posterImgPath}">
-                        <div>
-                            <div>
-                                <h2>${film.name}</h2>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </c:forEach>
-    </div>
-
-    <!-- Left and right controls -->
-    <a style="position: absolute; left: -16%" class="left carousel-control" href="#myCarousel" role="button"
-       data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-    </a>
-    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-    </a>
-</div>
+<fmt:message key="label.error"/><fmt:message key="label.errorMessage"/>
 
 
 </body>

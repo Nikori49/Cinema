@@ -11,27 +11,34 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
+import java.util.Objects;
 
-public class AddShowtimeCommand implements Command{
+/**
+ * Command which execute method validates and inserts Showtime object into DB.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ */
+public class AddShowtimeCommand implements Command {
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String address = "manager.jsp";
         String filmString = request.getParameter("film");
-        if (filmString.isEmpty()){
-            request.getSession().setAttribute("showtimeError",3);
+        if (filmString.isEmpty()) {
+            request.getSession().setAttribute("showtimeError", 3);
             return "addShowtime.jsp";
         }
         Long filmId = Long.valueOf(filmString);
-        String stringDate=request.getParameter("date");
-        if (stringDate.isEmpty()){
-            request.getSession().setAttribute("showtimeError",2);
+        String stringDate = request.getParameter("date");
+        if (stringDate.isEmpty()) {
+            request.getSession().setAttribute("showtimeError", 2);
             return "addShowtime.jsp";
         }
         Date date = Date.valueOf(request.getParameter("date"));
-        String time = request.getParameter("startTime")+":00";
-        if (time.equals(":00")){
-            request.getSession().setAttribute("showtimeError",1);
+        String time = request.getParameter("startTime") + ":00";
+        if (time.equals(":00")) {
+            request.getSession().setAttribute("showtimeError", 1);
             return "addShowtime.jsp";
         }
         List<Showtime> showtimeList = DBManager.getInstance().getShowtimeForDate(date);
@@ -41,28 +48,28 @@ public class AddShowtimeCommand implements Command{
 
         Time startTime = Time.valueOf(time);
         Film film = DBManager.getInstance().getFilm(filmId);
-        Time endTime = new Time(startTime.getTime()+(film.getRunningTime()*60000));
+        Time endTime = new Time(startTime.getTime() + (film.getRunningTime() * 60000));
         boolean flag = false;
-        if(startTime.getTime()<nineAm.getTime()||startTime.getTime()>twentyTwoPm.getTime()){
-            flag=true;
+        if (startTime.getTime() < nineAm.getTime() || startTime.getTime() > twentyTwoPm.getTime()) {
+            flag = true;
         }
-        if(endTime.getTime()>midnight.getTime()){
-            flag=true;
+        if (endTime.getTime() > midnight.getTime()) {
+            flag = true;
         }
-        for (Showtime s:showtimeList) {
+        for (Showtime s : showtimeList) {
 
-            if (startTime.getTime()>=s.getStartTime().getTime()&&startTime.getTime()<=s.getEndTime().getTime()){
-                flag=true;
+            if (Objects.equals(s.getStatus(), "planned") && startTime.getTime() >= s.getStartTime().getTime() && startTime.getTime() <= s.getEndTime().getTime()) {
+                flag = true;
             }
-            if (endTime.getTime()>=s.getStartTime().getTime()&&endTime.getTime()<=s.getEndTime().getTime()){
-                flag=true;
+            if (Objects.equals(s.getStatus(), "planned") && endTime.getTime() >= s.getStartTime().getTime() && endTime.getTime() <= s.getEndTime().getTime()) {
+                flag = true;
             }
-            if (flag){
+            if (flag) {
                 break;
             }
         }
-        if (flag){
-            request.getSession().setAttribute("showtimeError",1);
+        if (flag) {
+            request.getSession().setAttribute("showtimeError", 1);
             return "addShowtime.jsp";
         }
 
@@ -75,6 +82,8 @@ public class AddShowtimeCommand implements Command{
         showtime.setId(0L);
         DBManager.getInstance().createShowTime(showtime);
 
+        request.getServletContext().setAttribute("showtimeList", DBManager.getInstance().getPlannedShowtimes());
+        request.getServletContext().setAttribute("thisWeekShowtimeList", DBManager.getInstance().getShowtimesForWeek());
 
 
         return address;

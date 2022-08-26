@@ -9,7 +9,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="tg" tagdir="/WEB-INF/tags"  %>
+<%@ taglib prefix="tg" tagdir="/WEB-INF/tags" %>
 <%--@elvariable id="language" type="String"--%>
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
@@ -26,47 +26,39 @@
             let request
             const url = "${pageContext.request.contextPath }/ChangeLanguage?lang=" + lang;
 
-            if(window.XMLHttpRequest){
-                request=new XMLHttpRequest();
-            }
-            else if(window.ActiveXObject){
-                request=new ActiveXObject("Microsoft.XMLHTTP");
+            if (window.XMLHttpRequest) {
+                request = new XMLHttpRequest();
+            } else if (window.ActiveXObject) {
+                request = new ActiveXObject("Microsoft.XMLHTTP");
             }
 
-            try
-            {
-                request.open("GET",url,false);
+            try {
+                request.open("GET", url, false);
                 request.send();
-            }
-            catch(e)
-            {
+            } catch (e) {
                 alert("Unable to connect to server");
             }
             document.location.reload();
         }
     </script>
     <script>
-        let request;
+
         function changePage(sus) {
+            let request;
+            const url = "${pageContext.request.contextPath }/ChangePage?value=" + sus;
 
-            const url = "${pageContext.request.contextPath }/ChangePage?value=" +sus;
-
-            if(window.XMLHttpRequest){
-                request=new XMLHttpRequest();
+            if (window.XMLHttpRequest) {
+                request = new XMLHttpRequest();
+            } else if (window.ActiveXObject) {
+                request = new ActiveXObject("Microsoft.XMLHTTP");
             }
-            else if(window.ActiveXObject){
-                request=new ActiveXObject("Microsoft.XMLHTTP");
-            }
 
-            try
-            {
+            try {
 
-                request.open("GET",url,false);
+                request.open("GET", url, false);
                 request.send();
 
-            }
-            catch(e)
-            {
+            } catch (e) {
                 alert("Unable to connect to server");
             }
 
@@ -85,39 +77,44 @@
         <ul class="nav navbar-nav">
             <li><a href="films.jsp"><fmt:message key="label.films"/></a></li>
             <li class="active"><a href="schedule.jsp"><fmt:message key="label.schedule"/></a></li>
-            <c:if test="${loggedUser.role=='manager'}">
-                <li><a href="manager.jsp"><fmt:message key="label.managerWorkplace"/></a></li>
-            </c:if>
-
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <tg:changeLanguage/>
             <c:if test="${loggedUser==null}">
-                <li><a href="register.jsp"><span class="glyphicon glyphicon-user"></span><fmt:message key="label.signUp"/></a></li>
-                <li><a href="login.jsp"><span class="glyphicon glyphicon-log-in"></span><fmt:message key="label.logIn"/></a></li>
+                <li><a href="register.jsp"><span class="glyphicon glyphicon-user"></span><fmt:message
+                        key="label.signUp"/></a></li>
+                <li><a href="login.jsp"><span class="glyphicon glyphicon-log-in"></span><fmt:message key="label.logIn"/></a>
+                </li>
             </c:if>
             <c:if test="${loggedUser!=null}">
                 <li>
-                    <a href="${pageContext.request.contextPath }/LogOut" >
+                    <a href="${pageContext.request.contextPath }/LogOut">
                         <span class="glyphicon glyphicon glyphicon-log-out"></span><fmt:message key="label.logOut"/>
                     </a>
                 </li>
             </c:if>
             <c:if test="${loggedUser.role=='client'}">
-                <li><a href="client.jsp"><span class="glyphicon glyphicon-user"></span><fmt:message key="label.profile"/></a></li>
+                <li><a href="client.jsp"><span class="glyphicon glyphicon-user"></span><fmt:message
+                        key="label.profile"/></a></li>
             </c:if>
             <c:if test="${loggedUser.role=='manager'}">
-                <li><a href="manager.jsp"><span class=" glyphicon glyphicon-briefcase"></span><fmt:message key="label.managerWorkplace"/></a></li>
+                <li><a href="manager.jsp"><span class=" glyphicon glyphicon-briefcase"></span><fmt:message
+                        key="label.managerWorkplace"/></a></li>
             </c:if>
         </ul>
     </div>
 </nav>
+
 <%@ taglib prefix="cust" uri="WEB-INF/customLib.tld" %>
 <cust:searchFilmTag/>
+
 <div class="container">
     <%--@elvariable id="thisWeekShowtimeList" type="java.util.List"--%>
-    <c:forEach items="${thisWeekShowtimeList}" begin="${schedulePage}" end="${schedulePage}" var="showtimeList"   varStatus="status">
+    <c:forEach items="${thisWeekShowtimeList}" begin="${schedulePage}" end="${schedulePage}" var="showtimeList"
+               varStatus="status">
+
         <label for="table">
+
             <c:forEach items="${weekDays}" var="weekDay" varStatus="dayStatus">
                 <c:if test="${status.index==dayStatus.index}">
                     <fmt:message key="label.day${weekDay}"/>
@@ -125,7 +122,7 @@
             </c:forEach>
             <c:forEach items="${weekDates}" var="weekDate" varStatus="dateStatus">
                 <c:if test="${status.index==dateStatus.index}">
-                     ${weekDate}
+                    ${weekDate}
                 </c:if>
             </c:forEach>
         </label>
@@ -135,28 +132,35 @@
                 <th><fmt:message key="label.startTime"/></th>
                 <th><fmt:message key="label.endTime"/></th>
             </tr>
+            <c:if test="${empty showtimeList}">
+                <tr><fmt:message key="label.noShowtimes"/></tr>
+            </c:if>
             <c:forEach items="${showtimeList}" var="showtime">
+
                 <tr>
                     <td><a href="${pageContext.request.contextPath }/ShowtimePage?id=${showtime.id}">
                         <c:forEach items="${filmList}" var="film">
-                        <c:if test="${film.id==showtime.filmId}">${film.name}</c:if>
+                            <c:if test="${film.id==showtime.filmId}">${film.name}</c:if>
                         </c:forEach></a></td>
                     <td>
-                        ${showtime.startTime}
+                            ${showtime.startTime}
                     </td>
                     <td>
-                        ${showtime.endTime}
+                            ${showtime.endTime}
                     </td>
                 </tr>
             </c:forEach>
         </table>
     </c:forEach>
-        <ul class="pagination">
-            <c:forEach items="${weekDays}" var="day" varStatus="status">
-                <li <c:if test="${schedulePage==status.index}">class="active" </c:if> ><a <c:if test="${schedulePage!=status.index}">href="schedule.jsp" onclick="changePage(${status.index})" </c:if> ><fmt:message key="label.day${day}"/></a></li>
-            </c:forEach>
+    <ul class="pagination">
+        <c:forEach items="${weekDays}" var="day" varStatus="status">
+            <li
+                    <c:if test="${schedulePage==status.index}">class="active" </c:if> ><a
+                    <c:if test="${schedulePage!=status.index}">href="schedule.jsp"
+                    onclick="changePage(${status.index})" </c:if> ><fmt:message key="label.day${day}"/></a></li>
+        </c:forEach>
 
-        </ul>
+    </ul>
 
 </div>
 </body>

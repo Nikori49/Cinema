@@ -8,7 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
-
+/**
+ * Filter that restricts non manager users from accessing "manager.jsp" and related pages.
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ */
 @WebFilter(filterName = "ManagerWorkplaceFilter")
 public class ManagerWorkplaceFilter implements Filter {
     public void init(FilterConfig config) throws ServletException {

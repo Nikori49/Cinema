@@ -79,10 +79,6 @@
         <ul class="nav navbar-nav">
             <li><a href="films.jsp"><fmt:message key="label.films"/></a></li>
             <li><a href="schedule.jsp"><fmt:message key="label.schedule"/></a></li>
-            <c:if test="${loggedUser.role=='manager'}">
-                <li class="active"><a href="manager.jsp"><fmt:message key="label.managerWorkplace"/></a></li>
-            </c:if>
-
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <tg:changeLanguage/>
@@ -134,6 +130,10 @@
             <label for="inputPosterImg"><fmt:message key="label.posterImg"/></label>
             <input type="file" class="form-control-file" id="inputPosterImg" name="posterImg">
         </div>
+        <div class="form-group">
+            <label for="inputYoutubeTrailerId"><fmt:message key="label.youtubeTrailerId"/></label>
+            <input class="form-control" type="text" id="inputYoutubeTrailerId" name="youtubeTrailerId">
+        </div>
         <input class="btn btn-success" type="submit"  onsubmit="return validateForm()" value="<fmt:message key="label.addFilm"/>">
         <button class="btn btn-secondary" formaction="manager.jsp" ><fmt:message key="label.cancel"/></button>
     </form>
@@ -173,6 +173,12 @@
         <div  class="alert alert-danger alert- alert-dismissible">
             <button type="button" class="close" data-dismiss="alert"    onclick="resetError()">×</button>
             <strong><fmt:message key="label.error"/></strong><fmt:message key="label.invalidPosterImg"/>
+        </div>
+    </c:if>
+    <c:if test="${filmError==7}">
+        <div  class="alert alert-danger alert- alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert"    onclick="resetError()">×</button>
+            <strong><fmt:message key="label.error"/></strong><fmt:message key="label.invalidYoutubeTrailerId"/>
         </div>
     </c:if>
 </div>

@@ -16,40 +16,45 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class PurchaseTickets implements Command{
+/**
+ * Command which execute method validates and inserts Ticket object into DB.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ */
+public class PurchaseTickets implements Command {
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User user = (User) request.getSession().getAttribute("loggedUser");
-        if (user==null){
+        if (user == null) {
             return "login.jsp";
         }
-        if (!Objects.equals(user.getRole(), "client")){
+        if (!Objects.equals(user.getRole(), "client")) {
             return "index.jsp";
         }
         String showtimeId = request.getParameter("showtimeId");
-        if (showtimeId==null){
+        if (showtimeId == null) {
             return "error.jsp";
         }
         Showtime showtime = DBManager.getInstance().getShowTime(Long.valueOf(showtimeId));
-        if (showtime==null){
+        if (showtime == null) {
             return "error.jsp";
         }
         List<String> seatsPurchased = new ArrayList<>();
         Set<String> keySet = Utils.fillSeatMap().keySet();
-        for (String s:keySet) {
+        for (String s : keySet) {
             seatsPurchased.add(request.getParameter(s));
         }
         seatsPurchased.removeIf(Objects::isNull);
-        if (seatsPurchased.isEmpty()){
+        if (seatsPurchased.isEmpty()) {
             return "index.jsp";
         }
-        System.out.println(seatsPurchased);
-        for (String s:seatsPurchased) {
-            if(Objects.equals(DBManager.getInstance().getSeatStatus(s, showtime.getId()), "occupied")){
+        for (String s : seatsPurchased) {
+            if (Objects.equals(DBManager.getInstance().getSeatStatus(s, showtime.getId()), "occupied")) {
                 return "error.jsp";
             }
         }
-        for (String s:seatsPurchased) {
+        for (String s : seatsPurchased) {
             Ticket ticket = new Ticket();
             ticket.setSeat(s);
             ticket.setShowTimeId(showtime.getId());
@@ -57,7 +62,7 @@ public class PurchaseTickets implements Command{
             DBManager.getInstance().insertTicket(ticket);
         }
 
-        request.getSession().setAttribute("userTickets",DBManager.getInstance().getUserTickets(user));
+        request.getSession().setAttribute("userTickets", DBManager.getInstance().getUserTickets(user));
 
 
         return "client.jsp";

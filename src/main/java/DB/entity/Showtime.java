@@ -6,6 +6,26 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.TreeMap;
 
+/**
+ * Represents entry from DB table <code>show_times</code> .
+ * <p>
+ * Has the following fields:
+ * <ul>
+ *     <li><code>Long id</code></li>
+ *     <li><code>Long filmId</code></li>
+ *     <li><code>Date date</code></li>
+ *     <li><code>String status</code></li>
+ *     <li><code>Time startTime</code></li>
+ *     <li><code>Time endTime</code></li>
+ *     <li><code>TreeMap < String,String > seats</code>: TreeMap representing seats.
+ *     Where key is seat id from A1 to J24 and value is this seats status.</li>
+ * </ul>
+ * Setter and getter methods are provided.
+ *
+ * @author Mykyta Ponomarenko
+ * @version 1.0
+ * @see DB.DBManager
+ */
 public class Showtime {
     Long id;
     Long filmId;
@@ -13,7 +33,7 @@ public class Showtime {
     String status;
     Time startTime;
     Time endTime;
-    TreeMap<String,String> seats;
+    TreeMap<String, String> seats;
 
     public Showtime() {
     }
