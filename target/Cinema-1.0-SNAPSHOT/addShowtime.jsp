@@ -16,6 +16,9 @@
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
 
+<%--@elvariable id="filmService" type="service.FilmService"--%>
+<c:set value="${filmService.allFilms}" var="filmList"/>
+
 <html lang="${language}">
 <head>
     <title><fmt:message key="label.addShowtime"/></title>
@@ -89,13 +92,13 @@
         }
 
         function getDateShowtimeInfo() {
-            if(request.readyState==4){
+            if(request.readyState===4){
                 const val = request.responseText;
                 document.getElementById('dateShowtime').innerHTML=val;
             }
         }
         function getFilmInfo(){
-            if(request.readyState==4){
+            if(request.readyState===4){
                 const val = request.responseText;
                 document.getElementById('posterImg').innerHTML=val;
             }
@@ -202,7 +205,7 @@
         <div class="form-group">
             <label for="inputFilm"><fmt:message key="label.selectFilm"/></label>
             <select class="form-control" oninput="sendFilmInfo()" id="inputFilm" name="film">
-                <%--@elvariable id="filmList" type="java.util.List<DB.entity.Film>"--%>
+
                 <c:forEach items="${filmList}" var="film">
                     <option value="${film.id}" >${film.name}</option>
                 </c:forEach>

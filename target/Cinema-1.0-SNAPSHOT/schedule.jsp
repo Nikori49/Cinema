@@ -14,6 +14,14 @@
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
 
+<%--@elvariable id="showtimeService" type="service.ShowtimeService"--%>
+<c:set var="thisWeekShowtimeList" value="${showtimeService.showtimeForWeek}"/>
+<%--@elvariable id="utils" type="DB.Utils"--%>
+<c:set var="weekDates" value="${utils.weekDates}"/>
+<c:set var="weekDays" value="${utils.weekDays}"/>
+<%--@elvariable id="filmService" type="service.FilmService"--%>
+<c:set var="filmList" value="${filmService.allFilms}"/>
+
 <html lang="${language}">
 <head>
 
@@ -81,9 +89,15 @@
         <ul class="nav navbar-nav navbar-right">
             <tg:changeLanguage/>
             <c:if test="${loggedUser==null}">
-                <li><a href="register.jsp"><span class="glyphicon glyphicon-user"></span><fmt:message
-                        key="label.signUp"/></a></li>
-                <li><a href="login.jsp"><span class="glyphicon glyphicon-log-in"></span><fmt:message key="label.logIn"/></a>
+                <li>
+                    <a href="register.jsp"><span class="glyphicon glyphicon-user"></span>
+                        <fmt:message key="label.signUp"/>
+                    </a>
+                </li>
+                <li>
+                    <a href="login.jsp"><span class="glyphicon glyphicon-log-in"></span>
+                        <fmt:message key="label.logIn"/>
+                    </a>
                 </li>
             </c:if>
             <c:if test="${loggedUser!=null}">
@@ -94,12 +108,18 @@
                 </li>
             </c:if>
             <c:if test="${loggedUser.role=='client'}">
-                <li><a href="client.jsp"><span class="glyphicon glyphicon-user"></span><fmt:message
-                        key="label.profile"/></a></li>
+                <li>
+                    <a href="client.jsp"><span class="glyphicon glyphicon-user"></span>
+                        <fmt:message key="label.profile"/>
+                    </a>
+                </li>
             </c:if>
             <c:if test="${loggedUser.role=='manager'}">
-                <li><a href="manager.jsp"><span class=" glyphicon glyphicon-briefcase"></span><fmt:message
-                        key="label.managerWorkplace"/></a></li>
+                <li>
+                    <a href="manager.jsp"><span class=" glyphicon glyphicon-briefcase"></span>
+                        <fmt:message key="label.managerWorkplace"/>
+                    </a>
+                </li>
             </c:if>
         </ul>
     </div>
@@ -109,7 +129,7 @@
 <cust:searchFilmTag/>
 
 <div class="container">
-    <%--@elvariable id="thisWeekShowtimeList" type="java.util.List"--%>
+
     <c:forEach items="${thisWeekShowtimeList}" begin="${schedulePage}" end="${schedulePage}" var="showtimeList"
                varStatus="status">
 

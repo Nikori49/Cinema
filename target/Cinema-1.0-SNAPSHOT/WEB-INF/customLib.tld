@@ -12,11 +12,11 @@
 
     <tag>
         <name>searchFilmTag</name>
-        <tag-class>tags.SearchFilmTag</tag-class>
+        <tag-class>tag.SearchFilmTag</tag-class>
         <body-content>empty</body-content>
     </tag>
 
 
-    <!-- Invoke 'Generate' action to add tags or functions -->
+
 
 </taglib>

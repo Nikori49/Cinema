@@ -13,6 +13,13 @@
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
 
+<%--@elvariable id="showtimeService" type="service.ShowtimeService"--%>
+<c:set var="showtimeList" value="${showtimeService.plannedShowtime}"/>
+<%--@elvariable id="ticketService" type="service.TicketService"--%>
+<c:set var="userTickets" value="${ticketService.getUserTickets(sessionScope.get('loggedUser').id)}"/>
+<%--@elvariable id="filmService" type="service.FilmService"--%>
+<c:set var="filmList" value="${filmService.allFilms}"/>
+
 <html lang="${language}">
 <head>
     <%--@elvariable id="loggedUser" type="DB.entity.User"--%>
@@ -71,7 +78,8 @@
 </nav>
 <div class="container">
     <h2><fmt:message key="label.yourTickets"/></h2>
-    <%--@elvariable id="userTickets" type="java.util.List<DB.entity.Ticket>"--%>
+<%--@elvariable id="userTickets" type="java.util.List<DB.entity.Ticket>"--%>
+
     <c:if test="${userTickets==null}">
         <fmt:message key="label.noTickets"/>
     </c:if>
@@ -81,23 +89,21 @@
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <h3 class="panel-title" >
-                                <%--@elvariable id="filmList" type="java.util.List<DB.entity.Film>"--%>
 
-                        <%--@elvariable id="showtimeList" type="java.util.List<Showtime>"--%>
-                        <c:forEach items="${showtimeList}" var="showtime">
-                            <c:if test="${showtime.id==ticket.showTimeId}">
-                                <c:forEach items="${filmList}" var="film">
-                                    <c:if test="${film.id==showtime.filmId}">
-                                        ${film.name}
-                                    </c:if>
-                                </c:forEach>
-                            </c:if>
-                        </c:forEach></h3>
+                            <c:forEach items="${showtimeList}" var="showtime">
+                                <c:if test="${showtime.id==ticket.showTimeId}">
+                                    <c:forEach items="${filmList}" var="film">
+                                        <c:if test="${film.id==showtime.filmId}">
+                                            ${film.name}
+                                        </c:if>
+                                    </c:forEach>
+                                </c:if>
+                            </c:forEach></h3>
                     </div>
                     <div class="panel-body">
                         <c:forEach items="${showtimeList}" var="showtime">
                             <c:if test="${showtime.id==ticket.showTimeId}">
-                               <fmt:message key="label.date"/>:${showtime.date}  <fmt:message key="label.startEndTime"/>:${showtime.startTime}-${showtime.endTime}  <fmt:message key="label.seat"/>:${ticket.seat}
+                                <fmt:message key="label.date"/>:${showtime.date}  <fmt:message key="label.startEndTime"/>:${showtime.startTime}-${showtime.endTime}  <fmt:message key="label.seat"/>:${ticket.seat}
                             </c:if>
                         </c:forEach>
                     </div>
@@ -108,5 +114,6 @@
 
     </c:if>
 </div>
+
 </body>
 </html>

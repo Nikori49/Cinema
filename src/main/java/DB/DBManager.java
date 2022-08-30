@@ -4,13 +4,12 @@ import DB.entity.Film;
 import DB.entity.Showtime;
 import DB.entity.Ticket;
 import DB.entity.User;
+import DB.exception.DBException;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -22,50 +21,49 @@ import java.util.TreeMap;
  * @see ConnectionPool
  */
 public class DBManager {
-    private static DBManager instance;
-    private final Connection connection;
+    //    private static DBManager instance;
+    private final ConnectionPool connectionPool;
 
     /**
      * Returns existing DBManager instance or creates one if none exist.
      *
      * @return <code>DBManager</code> object
      */
-    public static synchronized DBManager getInstance() {
-        if (instance == null) {
-            try {
-                instance = new DBManager();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return instance;
-    }
-
-    private DBManager() throws SQLException {
-        this.connection = ConnectionPool.getInstance().getConnection();
+//    public static synchronized DBManager getInstance() throws DBException {
+//        if (instance == null) {
+//            try {
+//                instance = new DBManager();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//                throw new DBException();
+//            }
+//        }
+//        return instance;
+//    }
+    public DBManager(ConnectionPool connectionPool)  {
+        this.connectionPool = connectionPool;
     }
 
     public static final String GET_USER_BY_LOGIN = "SELECT * FROM users WHERE login=?";
     public static final String GET_USER_BY_EMAIL = "SELECT * FROM users WHERE email=?";
     public static final String GET_USER_BY_PHONE_NUMBER = "SELECT * FROM users WHERE phone_number=?";
     public static final String INSERT_USER = "INSERT INTO users VALUES (DEFAULT,?,?,?,?,?,md5(?),'client')";
-    public static final String GET_SHOWTIME_BY_DATE = "SELECT * FROM show_times WHERE date=?";
-    public static final String GET_SHOWTIME_BY_FILM_ID = "SELECT * FROM show_times WHERE filmId=?";
-    public static final String GET_SHOWTIME_BY_ID = "SELECT * FROM show_times WHERE id=?";
+    public static final String GET_SHOWTIME_BY_DATE = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.date=? ORDER BY show_times.id";
+    public static final String GET_SHOWTIME_BY_FILM_ID = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.filmId=? ORDER BY show_times.id";
+    public static final String GET_SHOWTIME_BY_ID = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.id=? ORDER BY show_times.id";
     public static final String CANCEL_SHOWTIME_BY_ID = "UPDATE cinema.show_times SET status='canceled' WHERE show_times.id=?";
     public static final String INSERT_FILM = "INSERT INTO films values (DEFAULT,?,?,?,?,?,?,?)";
     public static final String GET_FILM_BY_ID = "SELECT * FROM films WHERE id=?";
     public static final String GET_ALL_FILMS = "SELECT * FROM films";
-    public static final String GET_PLANNED_SHOWTIMES = "SELECT * FROM show_times WHERE status='planned'";
+    public static final String GET_PLANNED_SHOWTIMES = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.status='planned' ORDER BY show_times.id";
     public static final String INSERT_TICKET = "INSERT INTO tickets VALUES (DEFAULT,?,?,?)";
     public static final String GET_TICKET_BY_ID = "SELECT * FROM tickets WHERE id=?";
     public static final String GET_USERS_TICKETS = "SELECT * FROM tickets WHERE userId=?";
-    public static final String GET_SHOWTIMES_FOR_MONTH = "SELECT * FROM show_times WHERE date>=? AND date<=?";
-    public static final String GET_SHOWTIMES_FOR_WEEK = "SELECT * FROM show_times WHERE date=? AND status='planned'";
+    public static final String GET_SHOWTIMES_FOR_MONTH = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId  WHERE show_times.date>=? AND show_times.date<=? ORDER BY show_times.id";
+    public static final String GET_SHOWTIMES_FOR_WEEK = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.date=? AND show_times.status='planned' ORDER BY show_times.id";
     public static final String UPDATE_PAST_SHOWTIMES = "UPDATE show_times SET status = 'finished' WHERE NOT status = 'canceled' and (date<? OR (date = ? AND endTime < ?))";
     public static final String INSERT_SHOWTIME = "INSERT INTO show_times VALUES (DEFAULT,?,?,?,?,?)";
     public static final String INSERT_SEATS = "INSERT INTO seats VALUES (DEFAULT,?,?,'vacant')";
-    public static final String GET_SHOWTIME_SEATS = "SELECT * FROM seats WHERE showtimeId=?";
     public static final String UPDATE_SEAT_STATUS = "UPDATE seats SET status='occupied' WHERE seat=? AND showtimeId=?";
     public static final String GET_SEAT_STATUS = "SELECT * FROM seats WHERE seat=? AND showtimeId=?";
 
@@ -77,9 +75,11 @@ public class DBManager {
      * @return <code>User</code> object
      * @see User,DBManager
      */
-    public User getUser(String searchParameter, String statement) {
+    private User getUser(String searchParameter, String statement) throws DBException {
         User user = null;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+
             preparedStatement.setString(1, searchParameter);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -87,6 +87,7 @@ public class DBManager {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
+            throw new DBException();
         }
         return user;
     }
@@ -98,7 +99,7 @@ public class DBManager {
      * @return <code>User</code> object
      * @see User,DBManager
      */
-    public User findUserByEMail(String email) {
+    public User findUserByEMail(String email) throws DBException {
         return getUser(email, GET_USER_BY_EMAIL);
     }
 
@@ -109,7 +110,7 @@ public class DBManager {
      * @return <code>User</code> object
      * @see User,DBManager
      */
-    public User findUserByPhoneNumber(String phoneNumber) {
+    public User findUserByPhoneNumber(String phoneNumber) throws DBException {
         return getUser(phoneNumber, GET_USER_BY_PHONE_NUMBER);
     }
 
@@ -120,7 +121,7 @@ public class DBManager {
      * @return <code>User</code> object
      * @see User,DBManager
      */
-    public User findUserByLogin(String login) {
+    public User findUserByLogin(String login) throws DBException {
         return getUser(login, GET_USER_BY_LOGIN);
     }
 
@@ -131,9 +132,11 @@ public class DBManager {
      * @return <code>User</code> object
      * @see User,DBManager
      */
-    public User insertUser(User user) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS)) {
-            connection.setAutoCommit(false);
+    public User insertUser(User user) throws DBException {
+        try (Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS)) {
+
+
             preparedStatement.setString(1, user.getEmail());
             preparedStatement.setString(2, user.getPhoneNumber());
             preparedStatement.setString(3, user.getName());
@@ -147,12 +150,8 @@ public class DBManager {
             }
             connection.commit();
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
             e.printStackTrace();
+            throw new DBException();
         }
         return user;
     }
@@ -183,10 +182,13 @@ public class DBManager {
      * @param showtime <code>Showtime</code> object to insert
      * @see Showtime,java.util.Map,DBManager
      */
-    public void createShowTime(Showtime showtime) {
+    public void createShowTime(Showtime showtime) throws DBException {
+        Connection connection = null;
         try {
-            connection.setAutoCommit(false);
+            connection = connectionPool.getConnection();
             PreparedStatement preparedStatementInsertShowTime = connection.prepareStatement(INSERT_SHOWTIME, Statement.RETURN_GENERATED_KEYS);
+            connection.setAutoCommit(false);
+
             preparedStatementInsertShowTime.setLong(1, showtime.getFilmId());
             preparedStatementInsertShowTime.setDate(2, showtime.getDate());
             preparedStatementInsertShowTime.setString(3, showtime.getStatus());
@@ -197,7 +199,7 @@ public class DBManager {
             while (resultSet.next()) {
                 showtime.setId(resultSet.getLong(1));
             }
-            TreeMap<String, String> seatMap = Utils.fillSeatMap();
+            TreeMap<String, String> seatMap = new Utils().fillSeatMap();
             for (String seat : seatMap.keySet()) {
                 PreparedStatement preparedStatementInsertSeat = connection.prepareStatement(INSERT_SEATS);
                 preparedStatementInsertSeat.setLong(1, showtime.getId());
@@ -209,11 +211,14 @@ public class DBManager {
 
         } catch (SQLException e) {
             try {
-                connection.rollback();
+                if (connection != null) {
+                    connection.rollback();
+                }
             } catch (SQLException s) {
                 s.printStackTrace();
             }
             e.printStackTrace();
+            throw new DBException();
         }
     }
 
@@ -224,22 +229,21 @@ public class DBManager {
      * @return List of Showtime objects
      * @see Showtime,Date,DBManager
      */
-    public List<Showtime> getShowtimeForDate(Date date) {
+    public List<Showtime> getShowtimeForDate(Date date) throws DBException {
         List<Showtime> showtimeList = new ArrayList<>();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_DATE);
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_DATE)){
+
             preparedStatement.setDate(1, date);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Showtime showtime = extractShowtime(resultSet);
-
                 showtimeList.add(showtime);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DBException();
         }
-
-
         return showtimeList;
     }
 
@@ -250,10 +254,11 @@ public class DBManager {
      * @return List of Showtime objects
      * @see Showtime,DBManager,Film
      */
-    public List<Showtime> getShowtimeForFilm(Long filmId) {
+    public List<Showtime> getShowtimeForFilm(Long filmId) throws DBException {
         List<Showtime> showtimeList = new ArrayList<>();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_FILM_ID);
+        try (Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_FILM_ID)){
+
             preparedStatement.setLong(1, filmId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -263,6 +268,7 @@ public class DBManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DBException();
         }
 
 
@@ -276,19 +282,21 @@ public class DBManager {
      * @return Showtime object
      * @see Showtime,DBManager
      */
-    public Showtime getShowTime(Long id) {
+    public Showtime getShowTime(Long id) throws DBException {
         Showtime showtime = null;
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_ID);
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_ID)){
+
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
+            while (resultSet.next()){
                 showtime = extractShowtime(resultSet);
             }
 
 
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DBException();
         }
         return showtime;
     }
@@ -299,20 +307,17 @@ public class DBManager {
      * @param id <code>Long</code> object to search with.
      * @see Showtime,DBManager
      */
-    public void cancelShowtime(Long id) {
-        try {
-            connection.setAutoCommit(false);
-            PreparedStatement preparedStatement = connection.prepareStatement(CANCEL_SHOWTIME_BY_ID);
+    public void cancelShowtime(Long id) throws DBException {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(CANCEL_SHOWTIME_BY_ID)){
+
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
-            connection.commit();
+
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException s) {
-                s.printStackTrace();
-            }
+
             e.printStackTrace();
+            throw new DBException();
         }
     }
 
@@ -322,10 +327,10 @@ public class DBManager {
      * @param film <code>Film</code> object to insert.
      * @see Film,DBManager
      */
-    public void insertFilm(Film film) {
-        try {
-            connection.setAutoCommit(false);
-            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_FILM);
+    public void insertFilm(Film film) throws DBException {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_FILM)){
+
             preparedStatement.setString(1, film.getName());
             preparedStatement.setString(2, film.getDescription());
             preparedStatement.setString(3, film.getGenre());
@@ -336,12 +341,8 @@ public class DBManager {
             preparedStatement.execute();
             connection.commit();
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            }catch (SQLException s){
-                s.printStackTrace();
-            }
             e.printStackTrace();
+            throw new DBException();
         }
     }
 
@@ -354,8 +355,9 @@ public class DBManager {
      */
     public Film getFilm(Long id) {
         Film film = new Film();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_FILM_BY_ID);
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_FILM_BY_ID)){
+
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -373,16 +375,18 @@ public class DBManager {
      * @return List of Film objects
      * @see Film,java.util.List,DBManager
      */
-    public List<Film> getAllFilms() {
+    public List<Film> getAllFilms() throws DBException {
         List<Film> filmList = new ArrayList<>();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_FILMS);
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_FILMS)){
+
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 filmList.add(extractFilm(resultSet));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DBException();
         }
         return filmList;
     }
@@ -394,7 +398,7 @@ public class DBManager {
      * @return Film object
      * @see Film,ResultSet,DBManager
      */
-    public Film extractFilm(ResultSet resultSet) throws SQLException {
+    private Film extractFilm(ResultSet resultSet) throws SQLException {
         Film film = new Film();
         film.setId(resultSet.getLong("id"));
         film.setName(resultSet.getString("name"));
@@ -414,22 +418,25 @@ public class DBManager {
      * @return Showtime object
      * @see Showtime,ResultSet,DBManager
      */
-    public Showtime extractShowtime(ResultSet resultSet) throws SQLException {
+    private Showtime extractShowtime(ResultSet resultSet) throws SQLException {
         Showtime showtime = new Showtime();
-        showtime.setId(resultSet.getLong("id"));
+        showtime.setId(resultSet.getLong("show_times.id"));
         showtime.setFilmId(resultSet.getLong("filmId"));
         showtime.setDate(resultSet.getDate("date"));
-        showtime.setStatus(resultSet.getString("status"));
+        showtime.setStatus(resultSet.getString("show_times.status"));
         showtime.setStartTime(resultSet.getTime("startTime"));
         showtime.setEndTime(resultSet.getTime("endTime"));
-        PreparedStatement preparedStatementGetSeatTable = connection.prepareStatement(GET_SHOWTIME_SEATS);
-        preparedStatementGetSeatTable.setLong(1, resultSet.getLong("id"));
-        ResultSet resultSetSeatTable = preparedStatementGetSeatTable.executeQuery();
         TreeMap<String, String> seatMap = new TreeMap<>();
-        while (resultSetSeatTable.next()) {
-            seatMap.put(resultSetSeatTable.getString("seat"), resultSetSeatTable.getString("status"));
-        }
+        int counter=0;
+             do {
+                seatMap.put(resultSet.getString("seat"), resultSet.getString("seats.status"));
+                counter++;
+            } while (resultSet.next()&&counter<288);
+
         showtime.setSeats(seatMap);
+
+
+
         return showtime;
     }
 
@@ -439,8 +446,10 @@ public class DBManager {
      * @param ticket <code>Ticket</code> object to insert.
      * @see Ticket,DBManager
      */
-    public void insertTicket(Ticket ticket) {
+    public void insertTicket(Ticket ticket) throws DBException {
+        Connection connection =null;
         try {
+            connection = connectionPool.getConnection();
             connection.setAutoCommit(false);
             PreparedStatement preparedStatementForTicket = connection.prepareStatement(INSERT_TICKET);
             preparedStatementForTicket.setLong(1, ticket.getUserId());
@@ -459,7 +468,7 @@ public class DBManager {
                 s.printStackTrace();
             }
             e.printStackTrace();
-
+            throw new DBException();
         }
     }
 
@@ -470,10 +479,11 @@ public class DBManager {
      * @return Ticket object
      * @see Ticket,DBManager
      */
-    public Ticket getTicket(Long id) {
+    public Ticket getTicket(Long id) throws DBException {
         Ticket ticket = new Ticket();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_TICKET_BY_ID);
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_TICKET_BY_ID)){
+
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -481,6 +491,7 @@ public class DBManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DBException();
         }
         return ticket;
     }
@@ -491,16 +502,18 @@ public class DBManager {
      * @return List of Showtime objects
      * @see Showtime,DBManager
      */
-    public List<Showtime> getPlannedShowtimes() {
+    public List<Showtime> getPlannedShowtimes() throws DBException {
         List<Showtime> showtimeList = new ArrayList<>();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_PLANNED_SHOWTIMES);
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_PLANNED_SHOWTIMES)){
+
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 showtimeList.add(extractShowtime(resultSet));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DBException();
         }
         if (showtimeList.isEmpty()) {
             return null;
@@ -516,10 +529,11 @@ public class DBManager {
      * @return String seat status
      * @see Showtime,DBManager
      */
-    public String getSeatStatus(String key, Long showtimeId) {
+    public String getSeatStatus(String key, Long showtimeId) throws DBException {
         String status = null;
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_SEAT_STATUS);
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_SEAT_STATUS)){
+
             preparedStatement.setString(1, key);
             preparedStatement.setLong(2, showtimeId);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -528,6 +542,7 @@ public class DBManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DBException();
         }
         return status;
     }
@@ -539,17 +554,19 @@ public class DBManager {
      * @return List of Ticket objects
      * @see Ticket,DBManager
      */
-    public List<Ticket> getUserTickets(User user) {
+    public List<Ticket> getUserTickets(Long userId) throws DBException {
         List<Ticket> ticketList = new ArrayList<>();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_USERS_TICKETS);
-            preparedStatement.setLong(1, user.getId());
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_USERS_TICKETS)){
+
+            preparedStatement.setLong(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 ticketList.add(extractTicket(resultSet));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DBException();
         }
         return ticketList;
     }
@@ -561,7 +578,7 @@ public class DBManager {
      * @return Ticket object
      * @see DBManager,Ticket,ResultSet
      */
-    public Ticket extractTicket(ResultSet resultSet) throws SQLException {
+    private Ticket extractTicket(ResultSet resultSet) throws SQLException {
         Ticket ticket = new Ticket();
         ticket.setId(resultSet.getLong("id"));
         ticket.setUserId(resultSet.getLong("userId"));
@@ -577,11 +594,12 @@ public class DBManager {
      * @return List of Showtime objects
      * @see Showtime,DBManager
      */
-    public List<Showtime> getShowtimesForMonth(Date firstDay) {
+    public List<Showtime> getShowtimesForMonth(Date firstDay) throws DBException {
         List<Showtime> showtimeList = new ArrayList<>();
         Date lastDay = Date.valueOf(firstDay.toLocalDate().plusMonths(1));
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIMES_FOR_MONTH);
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIMES_FOR_MONTH)){
+
             preparedStatement.setDate(1, firstDay);
             preparedStatement.setDate(2, lastDay);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -590,6 +608,7 @@ public class DBManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DBException();
         }
         return showtimeList;
     }
@@ -600,15 +619,16 @@ public class DBManager {
      * @return List of Showtime objects
      * @see Showtime,DBManager
      */
-    public List<List<Showtime>> getShowtimesForWeek() {
+    public List<List<Showtime>> getShowtimesForWeek() throws DBException {
         List<List<Showtime>> weekList = new ArrayList<>();
         LocalDate localDate = LocalDate.now();
         Date date = Date.valueOf(localDate);
         long dateLong = date.getTime();
         for (int i = 0; i < 7; i++) {
-            try {
+            try (Connection connection = connectionPool.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIMES_FOR_WEEK)){
                 List<Showtime> showtimeList = new ArrayList<>();
-                PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIMES_FOR_WEEK);
+
                 preparedStatement.setDate(1, new Date(dateLong));
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
@@ -618,6 +638,7 @@ public class DBManager {
                 weekList.add(showtimeList);
             } catch (SQLException e) {
                 e.printStackTrace();
+                throw new DBException();
             }
             dateLong = dateLong + 86_400_000;
         }
@@ -629,24 +650,19 @@ public class DBManager {
      *
      * @see Showtime,DBManager
      */
-    public void updatePastShowtimeStatuses() {
+    public void updatePastShowtimeStatuses() throws DBException {
         LocalDate localDate = LocalDate.now();
         LocalTime localTime = LocalTime.now();
-        try {
-            connection.setAutoCommit(false);
-            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PAST_SHOWTIMES);
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PAST_SHOWTIMES);){
+
             preparedStatement.setDate(1, Date.valueOf(localDate));
             preparedStatement.setDate(2, Date.valueOf(localDate));
             preparedStatement.setTime(3, Time.valueOf(localTime));
             preparedStatement.execute();
-            connection.commit();
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException s) {
-                s.printStackTrace();
-            }
             e.printStackTrace();
+            throw new DBException();
         }
     }
 

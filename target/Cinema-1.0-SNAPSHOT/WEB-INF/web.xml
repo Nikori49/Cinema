@@ -6,7 +6,7 @@
 
     <filter>
         <filter-name>ManagerWorkplaceFilter</filter-name>
-        <filter-class>filters.ManagerWorkplaceFilter</filter-class>
+        <filter-class>filter.ManagerWorkplaceFilter</filter-class>
     </filter>
 
     <filter-mapping>
@@ -19,7 +19,7 @@
 
     <filter>
         <filter-name>LoginAndSignUpFilter</filter-name>
-        <filter-class>filters.LoginAndSignUpFilter</filter-class>
+        <filter-class>filter.LoginAndSignUpFilter</filter-class>
     </filter>
 
     <filter-mapping>
@@ -30,13 +30,19 @@
 
     <filter>
         <filter-name>ClientProfileFilter</filter-name>
-        <filter-class>filters.ClientProfileFilter</filter-class>
+        <filter-class>filter.ClientProfileFilter</filter-class>
     </filter>
 
     <filter-mapping>
         <filter-name>ClientProfileFilter</filter-name>
         <url-pattern>/client.jsp</url-pattern>
     </filter-mapping>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error.jsp</location>
+    </error-page>
+
 
 
 </web-app>

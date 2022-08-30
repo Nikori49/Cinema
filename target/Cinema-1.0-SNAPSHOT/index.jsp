@@ -7,6 +7,9 @@
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
 
+<%--@elvariable id="filmService" type="service.FilmService"--%>
+<c:set var="filmList" value="${filmService.allFilms}"/>
+
 <html lang="${language}">
 <head>
 
@@ -91,16 +94,16 @@
             </c:if>
         </ul>
     </div>
+
 </nav>
 
 <br/>
-
 
 <div class="container" style="position: absolute;top: 10%; left: 39%; width: 30%">
     <h1><fmt:message key="label.currentlyShowing"/></h1>
 </div>
 
-<div id="myCarousel" style="position: absolute;top: 17%; left: 40%; width: 300px" class="carousel slide" data-interval="1500"
+<div id="myCarousel" style="position: absolute;top: 17%; left: 40%; width: 300px" class="carousel slide" data-interval="3000"
      data-ride="carousel">
     <div class="carousel-inner" role="listbox">
         <c:forEach items="${filmList}" var="film" varStatus="status">

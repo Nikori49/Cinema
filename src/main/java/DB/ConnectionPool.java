@@ -14,10 +14,10 @@ import java.sql.SQLException;
  * @version 1.0
  */
 public class ConnectionPool {
-    private static ConnectionPool instance;
-    DataSource dataSource;
+//    private static ConnectionPool instance;
+    private DataSource dataSource;
 
-    private ConnectionPool() {
+    public ConnectionPool() {
         Context context;
 
         DataSource dataSource = null;
@@ -39,10 +39,10 @@ public class ConnectionPool {
      *
      * @return <code>ConnectionPool</code> object
      */
-    public static ConnectionPool getInstance() {
+ /*   public static ConnectionPool getInstance() {
         if (instance == null) instance = new ConnectionPool();
         return instance;
-    }
+    }*/
 
     /**
      * Returns connection established with data source.
