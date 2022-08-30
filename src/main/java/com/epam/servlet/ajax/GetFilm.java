@@ -1,9 +1,7 @@
-package servlet.ajax;
+package com.epam.servlet.ajax;
 
-import DB.DBManager;
-import DB.entity.Film;
-import DB.exception.DBException;
-import service.FilmService;
+import com.epam.dao.entity.Film;
+import com.epam.service.FilmService;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
