@@ -13,16 +13,16 @@
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
 
-<%--@elvariable id="showtimeService" type="service.ShowtimeService"--%>
+<%--@elvariable id="showtimeService" type="com.epam.service.ShowtimeService"--%>
 <c:set var="showtimeList" value="${showtimeService.plannedShowtime}"/>
-<%--@elvariable id="ticketService" type="service.TicketService"--%>
+<%--@elvariable id="ticketService" type="com.epam.service.TicketService"--%>
 <c:set var="userTickets" value="${ticketService.getUserTickets(sessionScope.get('loggedUser').id)}"/>
-<%--@elvariable id="filmService" type="service.FilmService"--%>
+<%--@elvariable id="filmService" type="com.epam.service.FilmService"--%>
 <c:set var="filmList" value="${filmService.allFilms}"/>
 
 <html lang="${language}">
 <head>
-    <%--@elvariable id="loggedUser" type="DB.entity.User"--%>
+    <%--@elvariable id="loggedUser" type="com.epam.dao.entity.User"--%>
     <title><fmt:message key="label.welcome"/>${loggedUser.name}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -78,7 +78,7 @@
 </nav>
 <div class="container">
     <h2><fmt:message key="label.yourTickets"/></h2>
-<%--@elvariable id="userTickets" type="java.util.List<DB.entity.Ticket>"--%>
+    <%--@elvariable id="userTickets" type="java.util.List<com.epam.dao.entity.Ticket>"--%>
 
     <c:if test="${userTickets==null}">
         <fmt:message key="label.noTickets"/>

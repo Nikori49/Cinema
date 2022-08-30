@@ -12,7 +12,7 @@
 
     <tag>
         <name>searchFilmTag</name>
-        <tag-class>tag.SearchFilmTag</tag-class>
+        <tag-class>com.epam.tag.SearchFilmTag</tag-class>
         <body-content>empty</body-content>
     </tag>
 

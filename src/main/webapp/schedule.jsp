@@ -14,12 +14,12 @@
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
 
-<%--@elvariable id="showtimeService" type="service.ShowtimeService"--%>
+<%--@elvariable id="showtimeService" type="com.epam.service.ShowtimeService"--%>
 <c:set var="thisWeekShowtimeList" value="${showtimeService.showtimeForWeek}"/>
-<%--@elvariable id="utils" type="DB.Utils"--%>
+<%--@elvariable id="utils" type="com.epam.dao.Utils"--%>
 <c:set var="weekDates" value="${utils.weekDates}"/>
 <c:set var="weekDays" value="${utils.weekDays}"/>
-<%--@elvariable id="filmService" type="service.FilmService"--%>
+<%--@elvariable id="filmService" type="com.epam.service.FilmService"--%>
 <c:set var="filmList" value="${filmService.allFilms}"/>
 
 <html lang="${language}">

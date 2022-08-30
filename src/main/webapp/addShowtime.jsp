@@ -1,5 +1,5 @@
 <%@ page import="java.util.List" %>
-<%@ page import="DB.entity.Film" %>
+<%@ page import="com.epam.dao.entity.Film" %>
 <%@ page import="java.util.function.Predicate" %>
 <%@ page import="java.util.Objects" %><%--
   Created by IntelliJ IDEA.
@@ -16,7 +16,7 @@
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
 
-<%--@elvariable id="filmService" type="service.FilmService"--%>
+<%--@elvariable id="filmService" type="com.epam.service.FilmService"--%>
 <c:set value="${filmService.allFilms}" var="filmList"/>
 
 <html lang="${language}">
@@ -174,7 +174,7 @@
         <ul class="nav navbar-nav">
             <li><a href="films.jsp"><fmt:message key="label.films"/></a></li>
             <li><a href="schedule.jsp"><fmt:message key="label.schedule"/></a></li>
-            <%--@elvariable id="loggedUser" type="DB.entity.User"--%>
+            <%--@elvariable id="loggedUser" type="com.epam.dao.entity.User"--%>
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <tg:changeLanguage/>

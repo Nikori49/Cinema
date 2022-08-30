@@ -7,7 +7,7 @@
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
 
-<%--@elvariable id="filmService" type="service.FilmService"--%>
+<%--@elvariable id="filmService" type="com.epam.service.FilmService"--%>
 <c:set var="filmList" value="${filmService.allFilms}"/>
 
 <html lang="${language}">
