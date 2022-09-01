@@ -1,5 +1,6 @@
 package com.epam.servlet.command;
 
+import com.epam.annotation.MyInject;
 import com.epam.service.ShowtimeService;
 
 import javax.servlet.ServletException;
@@ -16,6 +17,7 @@ import java.io.IOException;
 public class CancelShowtimeCommand implements Command {
     private final ShowtimeService showtimeService;
 
+    @MyInject
     public CancelShowtimeCommand(ShowtimeService showtimeService) {
         this.showtimeService = showtimeService;
     }

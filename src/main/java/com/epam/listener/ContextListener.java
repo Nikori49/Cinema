@@ -1,5 +1,6 @@
 package com.epam.listener;
 
+import com.epam.annotation.processor.ServiceInjectionProcessor;
 import com.epam.dao.ConnectionPool;
 import com.epam.dao.DBManager;
 import com.epam.dao.Utils;
@@ -14,6 +15,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Listener that upon Servlet Context initialization sets it required attributes.
@@ -29,16 +32,18 @@ public class ContextListener implements ServletContextListener{
 
         DBManager dbManager = new DBManager(new ConnectionPool());
 
-        UserService  userService = new UserService(dbManager);
-        TicketService ticketService = new TicketService(dbManager);
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
-        FilmService filmService = new FilmService(dbManager);
+        ServiceInjectionProcessor serviceInjectionProcessor = new ServiceInjectionProcessor(dbManager);
+        serviceInjectionProcessor.yakiysMethod("com.epam.service");
 
-        servletContext.setAttribute("userService",userService);
-        servletContext.setAttribute("ticketService",ticketService);
-        servletContext.setAttribute("showtimeService",showtimeService);
-        servletContext.setAttribute("filmService",filmService);
-        servletContext.setAttribute("commandContainer",new CommandContainer(ticketService,userService,showtimeService,filmService));
+        serviceInjectionProcessor.getMap().forEach((key,value)->{
+            String s = key.getSimpleName().substring(0,1).toLowerCase(Locale.ROOT);
+            servletContext.setAttribute(s+key.getSimpleName().substring(1),value);
+        });
+
+
+
+        servletContext.setAttribute("commandContainer",new CommandContainer(serviceInjectionProcessor));
+
 
 
 

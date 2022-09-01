@@ -1,11 +1,12 @@
 package com.epam.service;
 
+import com.epam.annotation.Service;
 import com.epam.dao.DBManager;
 import com.epam.dao.entity.Film;
 import com.epam.dao.exception.DBException;
 
 import java.util.List;
-
+@Service
 public class FilmService {
     private final DBManager dbManager;
 

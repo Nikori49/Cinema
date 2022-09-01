@@ -1,5 +1,6 @@
 package com.epam.servlet.command;
 
+import com.epam.annotation.MyInject;
 import com.epam.service.ShowtimeService;
 import com.epam.dao.Utils;
 import com.epam.dao.entity.Showtime;
@@ -22,11 +23,12 @@ import java.util.Set;
  * @author Mykyta Ponomarenko
  * @version 1.0
  */
-public class PurchaseTickets implements Command {
+public class PurchaseTicketsCommand implements Command {
     private final TicketService ticketService;
     private final ShowtimeService showtimeService;
 
-    public PurchaseTickets(TicketService ticketService, ShowtimeService showtimeService) {
+    @MyInject
+    public PurchaseTicketsCommand(TicketService ticketService, ShowtimeService showtimeService) {
         this.ticketService = ticketService;
         this.showtimeService = showtimeService;
     }

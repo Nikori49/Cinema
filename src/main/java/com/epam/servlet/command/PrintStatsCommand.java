@@ -1,5 +1,6 @@
 package com.epam.servlet.command;
 
+import com.epam.annotation.MyInject;
 import com.epam.service.ShowtimeService;
 import com.epam.dao.entity.Film;
 import com.epam.dao.entity.Showtime;
@@ -32,6 +33,7 @@ public class PrintStatsCommand implements Command {
     private final FilmService filmService;
     private final ShowtimeService showtimeService;
 
+    @MyInject
     public PrintStatsCommand(FilmService filmService, ShowtimeService showtimeService) {
         this.filmService = filmService;
         this.showtimeService = showtimeService;

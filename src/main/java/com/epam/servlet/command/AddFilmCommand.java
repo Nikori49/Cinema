@@ -1,5 +1,6 @@
 package com.epam.servlet.command;
 
+import com.epam.annotation.MyInject;
 import com.epam.dao.entity.Film;
 import com.epam.service.FilmService;
 
@@ -18,6 +19,7 @@ import java.io.IOException;
 public class AddFilmCommand implements Command {
     private final FilmService filmService;
 
+    @MyInject
     public AddFilmCommand(FilmService filmService) {
         this.filmService = filmService;
     }

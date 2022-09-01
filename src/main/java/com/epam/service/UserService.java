@@ -1,9 +1,11 @@
 package com.epam.service;
 
+import com.epam.annotation.Service;
 import com.epam.dao.DBManager;
 import com.epam.dao.entity.User;
 import com.epam.dao.exception.DBException;
 
+@Service
 public class UserService {
 
     private final DBManager dbManager;

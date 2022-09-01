@@ -1,5 +1,6 @@
 package com.epam.servlet.command;
 
+import com.epam.annotation.MyInject;
 import com.epam.dao.entity.User;
 import com.epam.service.UserService;
 
@@ -20,6 +21,7 @@ import java.util.Objects;
 public class LoginCommand implements Command {
     private final UserService userService;
 
+    @MyInject
     public LoginCommand(UserService userService) {
         this.userService = userService;
     }

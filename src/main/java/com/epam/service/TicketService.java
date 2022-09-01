@@ -1,11 +1,13 @@
 package com.epam.service;
 
+import com.epam.annotation.Service;
 import com.epam.dao.DBManager;
 import com.epam.dao.entity.Ticket;
 import com.epam.dao.exception.DBException;
 
 import java.util.List;
 
+@Service
 public class TicketService {
     private final DBManager dbManager;
 

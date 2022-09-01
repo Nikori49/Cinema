@@ -1,5 +1,6 @@
 package com.epam.servlet.command;
 
+import com.epam.annotation.MyInject;
 import com.epam.dao.entity.Film;
 import com.epam.dao.entity.Showtime;
 import com.epam.service.ShowtimeService;
@@ -24,6 +25,7 @@ public class AddShowtimeCommand implements Command {
     private final ShowtimeService showtimeService;
     private final FilmService filmService;
 
+    @MyInject
     public AddShowtimeCommand(ShowtimeService showtimeService, FilmService filmService) {
         this.showtimeService = showtimeService;
         this.filmService = filmService;

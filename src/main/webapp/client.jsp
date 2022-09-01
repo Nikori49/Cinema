@@ -8,7 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="tg" tagdir="/WEB-INF/tags"  %>
+<%@ taglib prefix="tg" tagdir="/WEB-INF/tags" %>
 <%--@elvariable id="language" type="String"--%>
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="General"/>
@@ -32,20 +32,16 @@
             let request
             const url = "${pageContext.request.contextPath }/ChangeLanguage?lang=" + lang;
 
-            if(window.XMLHttpRequest){
-                request=new XMLHttpRequest();
-            }
-            else if(window.ActiveXObject){
-                request=new ActiveXObject("Microsoft.XMLHTTP");
+            if (window.XMLHttpRequest) {
+                request = new XMLHttpRequest();
+            } else if (window.ActiveXObject) {
+                request = new ActiveXObject("Microsoft.XMLHTTP");
             }
 
-            try
-            {
-                request.open("GET",url,false);
+            try {
+                request.open("GET", url, false);
                 request.send();
-            }
-            catch(e)
-            {
+            } catch (e) {
                 alert("Unable to connect to server");
             }
             document.location.reload();
@@ -59,7 +55,7 @@
             <a class="navbar-brand" href="index.jsp"><fmt:message key="label.mainTitle"/></a>
         </div>
         <ul class="nav navbar-nav">
-            <li ><a href="films.jsp"><fmt:message key="label.films"/></a></li>
+            <li><a href="films.jsp"><fmt:message key="label.films"/></a></li>
             <li><a href="schedule.jsp"><fmt:message key="label.schedule"/></a></li>
         </ul>
 
@@ -67,12 +63,13 @@
             <tg:changeLanguage/>
             <c:if test="${loggedUser!=null}">
                 <li>
-                    <a href="${pageContext.request.contextPath }/LogOut" >
+                    <a href="${pageContext.request.contextPath }/LogOut">
                         <span class="glyphicon glyphicon glyphicon-log-out"></span><fmt:message key="label.logOut"/>
                     </a>
                 </li>
             </c:if>
-            <li class="active"><a href="client.jsp"><span class="glyphicon glyphicon-user"></span><fmt:message key="label.profile"/></a></li>
+            <li class="active"><a href="client.jsp"><span class="glyphicon glyphicon-user"></span><fmt:message
+                    key="label.profile"/></a></li>
         </ul>
     </div>
 </nav>
@@ -86,9 +83,18 @@
     <c:if test="${userTickets!=null}">
         <c:forEach items="${userTickets}" var="ticket">
             <div class="container">
-                <div class="panel panel-info">
+                <div class="panel <c:forEach items="${showtimeList}" var="showtime">
+                                <c:if test="${showtime.id==ticket.showTimeId}">
+                                    <c:if test="${showtime.status=='finished'}">
+                                     panel-success </c:if>
+                                     <c:if test="${showtime.status=='canceled'}">
+                                     panel-warning </c:if>
+                                     <c:if test="${showtime.status=='planned'}">
+                                     panel-info </c:if>
+                                </c:if>
+                            </c:forEach> ">
                     <div class="panel-heading">
-                        <h3 class="panel-title" >
+                        <h3 class="panel-title">
 
                             <c:forEach items="${showtimeList}" var="showtime">
                                 <c:if test="${showtime.id==ticket.showTimeId}">
@@ -103,7 +109,9 @@
                     <div class="panel-body">
                         <c:forEach items="${showtimeList}" var="showtime">
                             <c:if test="${showtime.id==ticket.showTimeId}">
-                                <fmt:message key="label.date"/>:${showtime.date}  <fmt:message key="label.startEndTime"/>:${showtime.startTime}-${showtime.endTime}  <fmt:message key="label.seat"/>:${ticket.seat}
+                                <fmt:message key="label.date"/>:${showtime.date}  <fmt:message
+                                    key="label.startEndTime"/>:${showtime.startTime}-${showtime.endTime}  <fmt:message
+                                    key="label.seat"/>:${ticket.seat}
                             </c:if>
                         </c:forEach>
                     </div>

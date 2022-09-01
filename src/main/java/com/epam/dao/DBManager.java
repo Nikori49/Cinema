@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -426,6 +427,11 @@ public class DBManager {
         showtime.setStatus(resultSet.getString("show_times.status"));
         showtime.setStartTime(resultSet.getTime("startTime"));
         showtime.setEndTime(resultSet.getTime("endTime"));
+        if(Objects.equals(showtime.getStatus(), "planned") &&
+                (showtime.getDate().compareTo(Date.valueOf(LocalDate.now()))<0
+                        ||(showtime.getDate().compareTo(Date.valueOf(LocalDate.now()))==0 && showtime.getEndTime().getTime()<Time.valueOf(LocalTime.now()).getTime()))){
+            showtime.setStatus("finished");
+        }
         TreeMap<String, String> seatMap = new TreeMap<>();
         int counter=0;
              do {

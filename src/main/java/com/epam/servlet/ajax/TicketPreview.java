@@ -81,7 +81,7 @@ public class TicketPreview extends HttpServlet {
                         .append("</div>\n");
             }
             stringBuilder.append("</div>");
-            stringBuilder.append("<div style=\"width: 50%; position: absolute; left: 50%; top: -20%\" class=\"container\">");
+            stringBuilder.append("<div style=\"width: 50%; position: absolute; left: 35%; top: 50%\" class=\"container\">");
             stringBuilder.append("<input class=\"btn btn-success\" type=\"submit\" value=\"")
                     .append(resourceBundle.getString("label.purchaseTickets"))
                     .append("\">");

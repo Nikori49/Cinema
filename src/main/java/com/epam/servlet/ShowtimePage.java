@@ -48,7 +48,7 @@ public class ShowtimePage extends HttpServlet {
         Showtime showtime = null;
         showtime = showtimeService.getShowtime(Long.valueOf(showtimeId));
 
-        System.out.println(showtime.getSeats());
+
 
         if (showtime == null) {
             response.sendRedirect("index.jsp");

@@ -1,5 +1,6 @@
 package com.epam.service;
 
+import com.epam.annotation.Service;
 import com.epam.dao.DBManager;
 import com.epam.dao.entity.Showtime;
 import com.epam.dao.exception.DBException;
@@ -7,6 +8,7 @@ import com.epam.dao.exception.DBException;
 import java.sql.Date;
 import java.util.List;
 
+@Service
 public class ShowtimeService {
     private final DBManager dbManager;
 
