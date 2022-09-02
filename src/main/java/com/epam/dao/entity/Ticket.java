@@ -2,6 +2,8 @@ package com.epam.dao.entity;
 
 import com.epam.dao.DBManager;
 
+import java.util.Objects;
+
 /**
  * Represents entry from DB table <code>tickets</code> .
  * <p>
@@ -67,5 +69,18 @@ public class Ticket extends Entity{
 
     public void setSeat(String seat) {
         this.seat = seat;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ticket ticket = (Ticket) o;
+        return Objects.equals(id, ticket.id) && Objects.equals(userId, ticket.userId) && Objects.equals(showTimeId, ticket.showTimeId) && Objects.equals(seat, ticket.seat);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, userId, showTimeId, seat);
     }
 }

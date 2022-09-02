@@ -4,6 +4,7 @@ import com.epam.dao.DBManager;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -105,5 +106,18 @@ public class Showtime extends Entity{
 
     public void setSeats(TreeMap<String, String> seats) {
         this.seats = seats;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Showtime showtime = (Showtime) o;
+        return Objects.equals(id, showtime.id) && Objects.equals(filmId, showtime.filmId) && Objects.equals(date, showtime.date) && Objects.equals(status, showtime.status) && Objects.equals(startTime, showtime.startTime) && Objects.equals(endTime, showtime.endTime) && Objects.equals(seats, showtime.seats);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, filmId, date, status, startTime, endTime, seats);
     }
 }

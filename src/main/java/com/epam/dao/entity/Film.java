@@ -2,6 +2,8 @@ package com.epam.dao.entity;
 
 import com.epam.dao.DBManager;
 
+import java.util.Objects;
+
 /**
  * Represents entry from DB table <code>films</code> .
  * <p>
@@ -112,5 +114,18 @@ public class Film extends Entity{
 
     public void setYoutubeTrailerId(String youtubeTrailerId) {
         this.youtubeTrailerId = youtubeTrailerId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Film film = (Film) o;
+        return Objects.equals(id, film.id) && Objects.equals(name, film.name) && Objects.equals(description, film.description) && Objects.equals(genre, film.genre) && Objects.equals(posterImgPath, film.posterImgPath) && Objects.equals(director, film.director) && Objects.equals(runningTime, film.runningTime) && Objects.equals(youtubeTrailerId, film.youtubeTrailerId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, genre, posterImgPath, director, runningTime, youtubeTrailerId);
     }
 }

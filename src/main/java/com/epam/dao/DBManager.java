@@ -190,7 +190,8 @@ public class DBManager {
             PreparedStatement preparedStatementInsertShowTime = connection.prepareStatement(INSERT_SHOWTIME, Statement.RETURN_GENERATED_KEYS);
             connection.setAutoCommit(false);
 
-            preparedStatementInsertShowTime.setLong(1, showtime.getFilmId());
+            preparedStatementInsertShowTime.setLong(1
+                    , showtime.getFilmId());
             preparedStatementInsertShowTime.setDate(2, showtime.getDate());
             preparedStatementInsertShowTime.setString(3, showtime.getStatus());
             preparedStatementInsertShowTime.setTime(4, showtime.getStartTime());
