@@ -21,8 +21,5 @@ public class ResetError extends HttpServlet {
         request.getSession().removeAttribute("registerError");
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    }
 }

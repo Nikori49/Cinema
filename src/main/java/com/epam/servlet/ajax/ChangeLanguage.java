@@ -19,8 +19,5 @@ public class ChangeLanguage extends HttpServlet {
         request.getSession().setAttribute("language", lang);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    }
 }

@@ -166,3 +166,5 @@
 2022-09-01 20:10:15 INFO  Controller:81 - redirect ==> manager.jsp
 2022-09-01 20:10:19 INFO  Controller:69 - commandName ==> login
 2022-09-01 20:10:19 INFO  Controller:81 - redirect ==> index.jsp
+2022-09-01 20:41:38 INFO  Controller:69 - commandName ==> login
+2022-09-01 20:41:38 INFO  Controller:81 - redirect ==> index.jsp

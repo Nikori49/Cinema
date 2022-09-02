@@ -18,7 +18,7 @@ import com.epam.dao.DBManager;
  * @version 1.0
  * @see DBManager
  */
-public class Ticket {
+public class Ticket extends Entity{
     Long id;
     Long userId;
     Long showTimeId;

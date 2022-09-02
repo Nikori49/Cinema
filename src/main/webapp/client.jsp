@@ -88,7 +88,7 @@
                                     <c:if test="${showtime.status=='finished'}">
                                      panel-success </c:if>
                                      <c:if test="${showtime.status=='canceled'}">
-                                     panel-warning </c:if>
+                                     panel-danger </c:if>
                                      <c:if test="${showtime.status=='planned'}">
                                      panel-info </c:if>
                                 </c:if>

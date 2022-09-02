@@ -14,12 +14,8 @@ public class ServiceInjectionProcessor {
 
     private final HashMap<Class<?>, Object> map = new HashMap();
 
-    public ServiceInjectionProcessor(DBManager dbManager) {
+    public ServiceInjectionProcessor(DBManager dbManager,String packagePath) {
         this.dbManager = dbManager;
-    }
-
-    public void yakiysMethod(String packagePath) {
-
         try {
 
             URL url = Thread.currentThread().getContextClassLoader().getResource(packagePath.replace(".", "/"));
@@ -42,27 +38,27 @@ public class ServiceInjectionProcessor {
             exception.printStackTrace();
             throw new RuntimeException();
         }
-
     }
+
 
     public Map<Class<?>,Object> getMap(){
         return new HashMap<>(map);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T yakiysMethod2(Class<T> commandClass) {
+    public <T> T createCommand(Class<T> commandClass) {
         try {
             if (commandClass.getConstructors().length > 1) {
-                throw new RuntimeException("sus");
+                throw new RuntimeException();
             }
 
             Constructor<?> constructor = commandClass.getConstructors()[0];
             if (!constructor.isAnnotationPresent(MyInject.class)) {
-                throw new RuntimeException("cringe");
+                throw new RuntimeException();
             }
 
             if (!map.keySet().containsAll(Arrays.asList(constructor.getParameterTypes()))) {
-                throw new RuntimeException("baka");
+                throw new RuntimeException();
             }
             List<Object> parameters = new ArrayList<>();
             for (Class c : constructor.getParameterTypes()) {

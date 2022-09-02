@@ -26,7 +26,7 @@ import java.util.TreeMap;
  * @version 1.0
  * @see DBManager
  */
-public class Showtime {
+public class Showtime extends Entity{
     Long id;
     Long filmId;
     java.sql.Date date;

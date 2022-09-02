@@ -24,7 +24,7 @@ import java.util.Objects;
  * @version 1.0
  * @see DBManager
  */
-public class User {
+public class User extends Entity{
     Long id;
     String email;
     String phoneNumber;

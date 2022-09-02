@@ -4,11 +4,7 @@ import com.epam.annotation.processor.ServiceInjectionProcessor;
 import com.epam.dao.ConnectionPool;
 import com.epam.dao.DBManager;
 import com.epam.dao.Utils;
-import com.epam.service.ShowtimeService;
-import com.epam.service.TicketService;
 import com.epam.servlet.command.CommandContainer;
-import com.epam.service.FilmService;
-import com.epam.service.UserService;
 
 
 import javax.servlet.ServletContext;
@@ -16,7 +12,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Listener that upon Servlet Context initialization sets it required attributes.
@@ -32,8 +27,8 @@ public class ContextListener implements ServletContextListener{
 
         DBManager dbManager = new DBManager(new ConnectionPool());
 
-        ServiceInjectionProcessor serviceInjectionProcessor = new ServiceInjectionProcessor(dbManager);
-        serviceInjectionProcessor.yakiysMethod("com.epam.service");
+        ServiceInjectionProcessor serviceInjectionProcessor = new ServiceInjectionProcessor(dbManager,"com.epam.service");
+
 
         serviceInjectionProcessor.getMap().forEach((key,value)->{
             String s = key.getSimpleName().substring(0,1).toLowerCase(Locale.ROOT);

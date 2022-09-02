@@ -56,7 +56,7 @@ public class DBManager {
     public static final String INSERT_FILM = "INSERT INTO films values (DEFAULT,?,?,?,?,?,?,?)";
     public static final String GET_FILM_BY_ID = "SELECT * FROM films WHERE id=?";
     public static final String GET_ALL_FILMS = "SELECT * FROM films";
-    public static final String GET_PLANNED_SHOWTIMES = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.status='planned' ORDER BY show_times.id";
+    public static final String GET_PLANNED_SHOWTIMES = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId  ORDER BY show_times.id";
     public static final String INSERT_TICKET = "INSERT INTO tickets VALUES (DEFAULT,?,?,?)";
     public static final String GET_TICKET_BY_ID = "SELECT * FROM tickets WHERE id=?";
     public static final String GET_USERS_TICKETS = "SELECT * FROM tickets WHERE userId=?";

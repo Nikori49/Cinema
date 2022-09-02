@@ -21,7 +21,7 @@ import com.epam.dao.DBManager;
  * @version 1.0
  * @see DBManager
  */
-public class Film {
+public class Film extends Entity{
     Long id;
     String name;
     String description;

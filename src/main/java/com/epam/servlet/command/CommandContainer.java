@@ -2,10 +2,6 @@ package com.epam.servlet.command;
 
 
 import com.epam.annotation.processor.ServiceInjectionProcessor;
-import com.epam.service.FilmService;
-import com.epam.service.ShowtimeService;
-import com.epam.service.TicketService;
-import com.epam.service.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,13 +23,13 @@ public class CommandContainer {
     public CommandContainer(ServiceInjectionProcessor serviceInjectionProcessor) {
 
         commands = new HashMap<>();
-        commands.put("login", serviceInjectionProcessor.yakiysMethod2(LoginCommand.class));
-        commands.put("addFilm", serviceInjectionProcessor.yakiysMethod2(AddFilmCommand.class));
-        commands.put("addShowtime", serviceInjectionProcessor.yakiysMethod2(AddShowtimeCommand.class));
-        commands.put("register", serviceInjectionProcessor.yakiysMethod2(RegisterCommand.class));
-        commands.put("cancelShowtime", serviceInjectionProcessor.yakiysMethod2(CancelShowtimeCommand.class));
-        commands.put("purchaseTickets", serviceInjectionProcessor.yakiysMethod2(PurchaseTicketsCommand.class));
-        commands.put("printStats", serviceInjectionProcessor.yakiysMethod2(PrintStatsCommand.class));
+        commands.put("login", serviceInjectionProcessor.createCommand(LoginCommand.class));
+        commands.put("addFilm", serviceInjectionProcessor.createCommand(AddFilmCommand.class));
+        commands.put("addShowtime", serviceInjectionProcessor.createCommand(AddShowtimeCommand.class));
+        commands.put("register", serviceInjectionProcessor.createCommand(RegisterCommand.class));
+        commands.put("cancelShowtime", serviceInjectionProcessor.createCommand(CancelShowtimeCommand.class));
+        commands.put("purchaseTickets", serviceInjectionProcessor.createCommand(PurchaseTicketsCommand.class));
+        commands.put("printStats", serviceInjectionProcessor.createCommand(PrintStatsCommand.class));
     }
 
     public Command getCommand(String commandName) {

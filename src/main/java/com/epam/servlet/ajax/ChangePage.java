@@ -18,8 +18,4 @@ public class ChangePage extends HttpServlet {
         request.getSession().setAttribute("schedulePage", request.getParameter("value"));
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-    }
 }
