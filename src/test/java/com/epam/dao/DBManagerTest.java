@@ -70,6 +70,7 @@ public class DBManagerTest {
 
         Assertions.assertEquals(user,test );
         Assertions.assertEquals(user.hashCode(), test.hashCode());
+        Assertions.assertEquals(user.getId(), test.getId());
 
 
     }
@@ -582,9 +583,12 @@ public class DBManagerTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
 
 
+        Showtime test = showtimeService.getShowtime(showtime1.getId());
 
 
-        Assertions.assertEquals(showtime1, showtimeService.getShowtime(showtime1.getId()));
+        Assertions.assertEquals(showtime1,test );
+        Assertions.assertEquals(showtime1.hashCode(),test.hashCode() );
+        Assertions.assertEquals(showtime1.toString(),test.toString() );
     }
 
     @Test
@@ -771,7 +775,11 @@ public class DBManagerTest {
         when(resultSet.getString("youtubeTrailerId")).thenReturn(film.getYoutubeTrailerId());
 
 
-        Assertions.assertEquals(film,filmService.getFilm(film.getId()));
+        Film test = filmService.getFilm(film.getId());
+
+        Assertions.assertEquals(film,test);
+        Assertions.assertEquals(film.hashCode(),test.hashCode());
+        Assertions.assertEquals(film.toString(),test.toString());
     }
 
     @Test
@@ -906,6 +914,7 @@ public class DBManagerTest {
 
         Assertions.assertEquals(ticket,test);
         Assertions.assertEquals(ticket.hashCode(),test.hashCode());
+        Assertions.assertEquals(ticket.toString(),test.toString());
     }
 
     @Test
@@ -969,6 +978,426 @@ public class DBManagerTest {
 
     }
 
+    @Test
+    public  void getPlannedShowtimeTest() throws SQLException {
+        ConnectionPool connectionPool = mock(ConnectionPool.class);
+        Connection connection = mock(Connection.class);
+        when(connectionPool.getConnection())
+                .thenReturn(connection);
+        String statement = DBManager.GET_PLANNED_SHOWTIMES;
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(connection.prepareStatement(statement))
+                .thenReturn(preparedStatement);
+        DBManager dbManager = new DBManager(connectionPool);
+
+        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+
+        Showtime showtime1 = new Showtime();
+        showtime1.setDate(Date.valueOf("2022-08-12"));
+        showtime1.setId(1L);
+        showtime1.setStatus("finished");
+        TreeMap<String,String> treeMap = new TreeMap<>();
+        treeMap.put("A1","vacant");
+        treeMap.put("A2","vacant");
+        showtime1.setSeats(treeMap);
+        showtime1.setFilmId(1L);
+        showtime1.setStartTime(Time.valueOf("10:10:10"));
+        showtime1.setEndTime(Time.valueOf("12:12:12"));
+
+
+
+        Set<String> stringSet = new Utils().fillSeatMap().keySet();
+
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(resultSet.next())
+                .thenReturn(true,true,false);
+
+
+
+
+
+        when(resultSet.getLong("id"))
+                .thenReturn(showtime1.getId())
+                .thenReturn(showtime1.getId());
+
+
+
+
+        when(resultSet.getLong("show_times.id"))
+                .thenReturn(showtime1.getId())
+                .thenReturn(showtime1.getId());
+
+
+
+
+
+        when(resultSet.getLong("filmId"))
+                .thenReturn(showtime1.getFilmId())
+                .thenReturn(showtime1.getFilmId());
+
+
+
+
+
+        when(resultSet.getDate("date"))
+                .thenReturn(showtime1.getDate())
+                .thenReturn(showtime1.getDate());
+
+
+
+
+
+        when(resultSet.getString("show_times.status"))
+                .thenReturn(showtime1.getStatus())
+                .thenReturn("planned");
+
+
+
+
+
+        when(resultSet.getTime("startTime"))
+                .thenReturn(showtime1.getStartTime())
+                .thenReturn(showtime1.getStartTime());
+
+
+
+
+
+        when(resultSet.getTime("endTime"))
+                .thenReturn(showtime1.getEndTime())
+                .thenReturn(showtime1.getEndTime());
+
+
+
+
+
+        when(resultSet.getString("seat"))
+                .thenReturn("A1")
+                .thenReturn("A2");
+        when(resultSet.getString("seats.status"))
+                .thenReturn("vacant")
+                .thenReturn("vacant");
+
+
+        List<Showtime> showtimeList = new ArrayList<>();
+        showtimeList.add(showtime1);
+
+
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+
+
+
+
+        Assertions.assertEquals(showtimeList, showtimeService.getPlannedShowtime());
+    }
+
+    @Test
+    public void getSeatStatusTest() throws SQLException {
+        ConnectionPool connectionPool = mock(ConnectionPool.class);
+        Connection connection = mock(Connection.class);
+        when(connectionPool.getConnection())
+                .thenReturn(connection);
+        String statement = DBManager.GET_SEAT_STATUS;
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(connection.prepareStatement(statement))
+                .thenReturn(preparedStatement);
+        DBManager dbManager = new DBManager(connectionPool);
+
+        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+
+        Showtime showtime1 = new Showtime();
+        showtime1.setDate(Date.valueOf("2022-08-12"));
+        showtime1.setId(1L);
+        showtime1.setStatus("finished");
+        TreeMap<String,String> treeMap = new TreeMap<>();
+        treeMap.put("A1","vacant");
+        treeMap.put("A2","vacant");
+        showtime1.setSeats(treeMap);
+        showtime1.setFilmId(1L);
+        showtime1.setStartTime(Time.valueOf("10:10:10"));
+        showtime1.setEndTime(Time.valueOf("12:12:12"));
+
+
+
+        Set<String> stringSet = new Utils().fillSeatMap().keySet();
+
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(resultSet.next())
+                .thenReturn(true,false);
+
+
+        when(resultSet.getString("status"))
+                .thenReturn("vacant");
+
+
+        List<Showtime> showtimeList = new ArrayList<>();
+        showtimeList.add(showtime1);
+
+
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+
+
+
+
+        Assertions.assertEquals("vacant", showtimeService.getSeatStatus(showtime1.getSeats().firstKey(),showtime1.getId()));
+    }
+
+    @Test
+    public void getShowtimeForMonthTest() throws SQLException {
+        ConnectionPool connectionPool = mock(ConnectionPool.class);
+        Connection connection = mock(Connection.class);
+        when(connectionPool.getConnection())
+                .thenReturn(connection);
+        String statement = DBManager.GET_SHOWTIMES_FOR_MONTH;
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(connection.prepareStatement(statement))
+                .thenReturn(preparedStatement);
+        DBManager dbManager = new DBManager(connectionPool);
+
+        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+
+        Showtime showtime1 = new Showtime();
+        showtime1.setDate(Date.valueOf("2222-08-12"));
+        showtime1.setId(1L);
+        showtime1.setStatus("planned");
+        TreeMap<String,String> treeMap = new TreeMap<>();
+        treeMap.put("A1","vacant");
+        treeMap.put("A2","vacant");
+        showtime1.setSeats(treeMap);
+        showtime1.setFilmId(1L);
+        showtime1.setStartTime(Time.valueOf("10:10:10"));
+        showtime1.setEndTime(Time.valueOf("12:12:12"));
+
+
+
+        Set<String> stringSet = new Utils().fillSeatMap().keySet();
+
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(resultSet.next())
+                .thenReturn(true,true,false);
+
+
+
+
+
+        when(resultSet.getLong("id"))
+                .thenReturn(showtime1.getId())
+                .thenReturn(showtime1.getId());
+
+
+
+
+        when(resultSet.getLong("show_times.id"))
+                .thenReturn(showtime1.getId())
+                .thenReturn(showtime1.getId());
+
+
+
+
+
+        when(resultSet.getLong("filmId"))
+                .thenReturn(showtime1.getFilmId())
+                .thenReturn(showtime1.getFilmId());
+
+
+
+
+
+        when(resultSet.getDate("date"))
+                .thenReturn(showtime1.getDate())
+                .thenReturn(showtime1.getDate());
+
+
+
+
+
+        when(resultSet.getString("show_times.status"))
+                .thenReturn(showtime1.getStatus())
+                .thenReturn("planned");
+
+
+
+
+
+        when(resultSet.getTime("startTime"))
+                .thenReturn(showtime1.getStartTime())
+                .thenReturn(showtime1.getStartTime());
+
+
+
+
+
+        when(resultSet.getTime("endTime"))
+                .thenReturn(showtime1.getEndTime())
+                .thenReturn(showtime1.getEndTime());
+
+
+
+
+
+        when(resultSet.getString("seat"))
+                .thenReturn("A1")
+                .thenReturn("A2");
+        when(resultSet.getString("seats.status"))
+                .thenReturn("vacant")
+                .thenReturn("vacant");
+
+
+        List<Showtime> showtimeList = new ArrayList<>();
+        showtimeList.add(showtime1);
+
+
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+
+
+
+
+        Assertions.assertEquals(showtimeList, showtimeService.getShowtimeForMonth(showtime1.getDate()));
+    }
+
+    @Test
+    public void getShowtimeForWeek() throws SQLException {
+        ConnectionPool connectionPool = mock(ConnectionPool.class);
+        Connection connection = mock(Connection.class);
+        when(connectionPool.getConnection())
+                .thenReturn(connection);
+        String statement = DBManager.GET_SHOWTIMES_FOR_WEEK;
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(connection.prepareStatement(statement))
+                .thenReturn(preparedStatement);
+        DBManager dbManager = new DBManager(connectionPool);
+
+        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+
+        Showtime showtime1 = new Showtime();
+        showtime1.setDate(Date.valueOf("2022-08-12"));
+        showtime1.setId(1L);
+        showtime1.setStatus("finished");
+        TreeMap<String,String> treeMap = new TreeMap<>();
+        treeMap.put("A1","vacant");
+        treeMap.put("A2","vacant");
+        showtime1.setSeats(treeMap);
+        showtime1.setFilmId(1L);
+        showtime1.setStartTime(Time.valueOf("10:10:10"));
+        showtime1.setEndTime(Time.valueOf("12:12:12"));
+
+
+
+        Set<String> stringSet = new Utils().fillSeatMap().keySet();
+
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(resultSet.next())
+                .thenReturn(true,true,false);
+
+
+
+
+
+        when(resultSet.getLong("id"))
+                .thenReturn(showtime1.getId())
+                .thenReturn(showtime1.getId());
+
+
+
+
+        when(resultSet.getLong("show_times.id"))
+                .thenReturn(showtime1.getId())
+                .thenReturn(showtime1.getId());
+
+
+
+
+
+        when(resultSet.getLong("filmId"))
+                .thenReturn(showtime1.getFilmId())
+                .thenReturn(showtime1.getFilmId());
+
+
+
+
+
+        when(resultSet.getDate("date"))
+                .thenReturn(showtime1.getDate())
+                .thenReturn(showtime1.getDate());
+
+
+
+
+
+        when(resultSet.getString("show_times.status"))
+                .thenReturn(showtime1.getStatus())
+                .thenReturn("planned");
+
+
+
+
+
+        when(resultSet.getTime("startTime"))
+                .thenReturn(showtime1.getStartTime())
+                .thenReturn(showtime1.getStartTime());
+
+
+
+
+
+        when(resultSet.getTime("endTime"))
+                .thenReturn(showtime1.getEndTime())
+                .thenReturn(showtime1.getEndTime());
+
+
+
+
+
+        when(resultSet.getString("seat"))
+                .thenReturn("A1")
+                .thenReturn("A2");
+        when(resultSet.getString("seats.status"))
+                .thenReturn("vacant")
+                .thenReturn("vacant");
+
+
+        List<Showtime> showtimeList = new ArrayList<>();
+        showtimeList.add(showtime1);
+
+
+
+
+        List<List<Showtime>> list =  new ArrayList<>();
+        list.add(showtimeList);
+        for (int i = 0;i<6;i++){
+
+            list.add(new ArrayList<>());
+        }
+
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+
+
+
+
+        Assertions.assertEquals(list, showtimeService.getShowtimeForWeek());
+    }
+
+    @Test
+    public void updatePastShowtimeTest() throws SQLException {
+        ConnectionPool connectionPool = mock(ConnectionPool.class);
+        Connection connection = mock(Connection.class);
+        when(connectionPool.getConnection())
+                .thenReturn(connection);
+        String statement = DBManager.UPDATE_PAST_SHOWTIMES;
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(connection.prepareStatement(statement))
+                .thenReturn(preparedStatement);
+        DBManager dbManager = new DBManager(connectionPool);
+
+        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+
+
+        Assertions.assertDoesNotThrow(showtimeService::finishPastShowtime);
+    }
 
 
 

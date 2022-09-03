@@ -67,16 +67,17 @@ public class AddFilmCommand implements Command {
         film.setName(filmName);
         filmName = filmName.replaceAll("\\W+", "_");
 
-        filePart.write("C:\\Users\\yohoh\\Desktop\\JAVA\\Cinema\\src\\main\\webapp\\posterImages\\" + filmName + "_poster");
 
         film.setDescription(filmDescription);
         film.setGenre(filmGenre);
         film.setDirector(filmDirector);
         film.setRunningTime(filmRuntime);
         film.setPosterImgPath("posterImages/" + filmName + "_poster");
+        film.setYoutubeTrailerId(youtubeTrailerId);
 
 
         filmService.createFilm(film);
+        filePart.write("C:\\Users\\yohoh\\Desktop\\JAVA\\Cinema\\src\\main\\webapp\\posterImages\\" + filmName + "_poster");
 
         return address;
     }

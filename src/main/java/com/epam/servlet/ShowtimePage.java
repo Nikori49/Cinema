@@ -201,7 +201,7 @@ public class ShowtimePage extends HttpServlet {
             return o1.compareTo(o2);
         });
 
-        System.out.println(seatList);
+
 
         int counter = 1;
         for (String s : seatList) {
@@ -231,8 +231,5 @@ public class ShowtimePage extends HttpServlet {
         out.write("</body");
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    }
 }

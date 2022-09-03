@@ -5,6 +5,9 @@ import com.epam.dao.entity.Showtime;
 import com.epam.dao.entity.Ticket;
 import com.epam.dao.entity.User;
 import com.epam.dao.exception.DBException;
+import com.epam.servlet.Controller;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -25,6 +28,8 @@ public class DBManager {
     //    private static DBManager instance;
     private final ConnectionPool connectionPool;
 
+    private static final Logger logger = LogManager.getLogger(DBManager.class);
+
     /**
      * Returns existing DBManager instance or creates one if none exist.
      *
@@ -41,6 +46,7 @@ public class DBManager {
 //        }
 //        return instance;
 //    }
+
     public DBManager(ConnectionPool connectionPool)  {
         this.connectionPool = connectionPool;
     }
@@ -87,7 +93,7 @@ public class DBManager {
                 user = extractUser(resultSet);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex.getMessage(),ex);
             throw new DBException();
         }
         return user;
@@ -151,7 +157,7 @@ public class DBManager {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
         return user;
@@ -219,7 +225,7 @@ public class DBManager {
             } catch (SQLException s) {
                 s.printStackTrace();
             }
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
     }
@@ -243,7 +249,7 @@ public class DBManager {
                 showtimeList.add(showtime);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
         return showtimeList;
@@ -269,7 +275,7 @@ public class DBManager {
                 showtimeList.add(showtime);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
 
@@ -297,7 +303,7 @@ public class DBManager {
 
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
         return showtime;
@@ -318,7 +324,7 @@ public class DBManager {
 
         } catch (SQLException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
     }
@@ -341,7 +347,7 @@ public class DBManager {
             preparedStatement.setLong(6, film.getRunningTime());
             preparedStatement.setString(7, film.getYoutubeTrailerId());
             preparedStatement.execute();
-            connection.commit();
+
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DBException();
@@ -366,7 +372,7 @@ public class DBManager {
                 film = extractFilm(resultSet);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
         return film;
     }
@@ -387,7 +393,7 @@ public class DBManager {
                 filmList.add(extractFilm(resultSet));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
         return filmList;
@@ -474,7 +480,7 @@ public class DBManager {
             } catch (SQLException s) {
                 s.printStackTrace();
             }
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
     }
@@ -497,7 +503,7 @@ public class DBManager {
                 ticket = extractTicket(resultSet);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
         return ticket;
@@ -519,7 +525,7 @@ public class DBManager {
                 showtimeList.add(extractShowtime(resultSet));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
         if (showtimeList.isEmpty()) {
@@ -548,7 +554,7 @@ public class DBManager {
                 status = resultSet.getString("status");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
         return status;
@@ -572,7 +578,7 @@ public class DBManager {
                 ticketList.add(extractTicket(resultSet));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
         return ticketList;
@@ -614,7 +620,7 @@ public class DBManager {
                 showtimeList.add(extractShowtime(resultSet));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
         return showtimeList;
@@ -644,7 +650,7 @@ public class DBManager {
                 showtimeList.sort((o1, o2) -> (int) (o1.getStartTime().getTime() - o2.getStartTime().getTime()));
                 weekList.add(showtimeList);
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(),e);
                 throw new DBException();
             }
             dateLong = dateLong + 86_400_000;
@@ -661,14 +667,14 @@ public class DBManager {
         LocalDate localDate = LocalDate.now();
         LocalTime localTime = LocalTime.now();
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PAST_SHOWTIMES);){
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PAST_SHOWTIMES)){
 
             preparedStatement.setDate(1, Date.valueOf(localDate));
             preparedStatement.setDate(2, Date.valueOf(localDate));
             preparedStatement.setTime(3, Time.valueOf(localTime));
             preparedStatement.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new DBException();
         }
     }
