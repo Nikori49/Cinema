@@ -11,6 +11,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -142,7 +143,7 @@ public class FilmPage extends HttpServlet {
                 "    </div>\n" +
                 "</div>");
         out.write("<div class=\"container\">\n" +
-                "    <img width=\"400\" height=\"600\" class=\"img-responsive\" alt=\"Missing poster\" src=\"" + film.getPosterImgPath() + "\">\n" +
+                "    <img  alt=\"Missing poster\" src=\"" + film.getPosterImgPath() + "\" width=\"400\" height=\"600\">\n" +
                 "    <h3>" + film.getName() + "</h3>\n" +
                 "    <div class=\"container\">\n" +
                 "        <h5>" + resourceBundle.getString("label.director") + "</h5>\n" +
@@ -164,7 +165,7 @@ public class FilmPage extends HttpServlet {
         List<Showtime> showtimeList = null;
         showtimeList = showtimeService.getShowtimeForFilm(film.getId());
         if (!showtimeList.isEmpty()) {
-            showtimeList.removeIf(showtime -> Objects.equals(showtime.getStatus(), "finished") || Objects.equals(showtime.getStatus(), "canceled"));
+            showtimeList.removeIf(showtime -> Objects.equals(showtime.getStatus(), "finished") || Objects.equals(showtime.getStatus(), "canceled") || showtime.getDate().toLocalDate().compareTo(LocalDate.now().plusDays(7))>0);
             if (!showtimeList.isEmpty()) {
                 showtimeList.sort(Comparator.comparing(Showtime::getDate));
                 out.write("<div class=\"container\">");

@@ -10,12 +10,10 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Class that handles DB interactions.
@@ -46,15 +44,15 @@ public class DBManager {
 //        }
 //        return instance;
 //    }
-
-    public DBManager(ConnectionPool connectionPool)  {
+    public DBManager(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
     public static final String GET_USER_BY_LOGIN = "SELECT * FROM users WHERE login=?";
     public static final String GET_USER_BY_EMAIL = "SELECT * FROM users WHERE email=?";
     public static final String GET_USER_BY_PHONE_NUMBER = "SELECT * FROM users WHERE phone_number=?";
-    public static final String INSERT_USER = "INSERT INTO users VALUES (DEFAULT,?,?,?,?,?,md5(?),'client')";
+    public static final String GET_USER_BY_ID = "SELECT * FROM users WHERE id=?";
+    public static final String INSERT_USER = "INSERT INTO users VALUES (DEFAULT,?,?,?,?,?,md5(?),'client',0)";
     public static final String GET_SHOWTIME_BY_DATE = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.date=? ORDER BY show_times.id";
     public static final String GET_SHOWTIME_BY_FILM_ID = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.filmId=? ORDER BY show_times.id";
     public static final String GET_SHOWTIME_BY_ID = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.id=? ORDER BY show_times.id";
@@ -63,7 +61,7 @@ public class DBManager {
     public static final String GET_FILM_BY_ID = "SELECT * FROM films WHERE id=?";
     public static final String GET_ALL_FILMS = "SELECT * FROM films";
     public static final String GET_PLANNED_SHOWTIMES = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId  ORDER BY show_times.id";
-    public static final String INSERT_TICKET = "INSERT INTO tickets VALUES (DEFAULT,?,?,?)";
+    public static final String INSERT_TICKET = "INSERT INTO tickets VALUES (DEFAULT,?,?,?,'purchased')";
     public static final String GET_TICKET_BY_ID = "SELECT * FROM tickets WHERE id=?";
     public static final String GET_USERS_TICKETS = "SELECT * FROM tickets WHERE userId=?";
     public static final String GET_SHOWTIMES_FOR_MONTH = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId  WHERE show_times.date>=? AND show_times.date<=? ORDER BY show_times.id";
@@ -71,8 +69,11 @@ public class DBManager {
     public static final String UPDATE_PAST_SHOWTIMES = "UPDATE show_times SET status = 'finished' WHERE NOT status = 'canceled' and (date<? OR (date = ? AND endTime < ?))";
     public static final String INSERT_SHOWTIME = "INSERT INTO show_times VALUES (DEFAULT,?,?,?,?,?)";
     public static final String INSERT_SEATS = "INSERT INTO seats VALUES (DEFAULT,?,?,'vacant')";
-    public static final String UPDATE_SEAT_STATUS = "UPDATE seats SET status='occupied' WHERE seat=? AND showtimeId=?";
+    public static final String UPDATE_SEAT_STATUS = "UPDATE seats SET status=? WHERE seat=? AND showtimeId=?";
     public static final String GET_SEAT_STATUS = "SELECT * FROM seats WHERE seat=? AND showtimeId=?";
+    public static final String UPDATE_USER_BALANCE = "UPDATE users SET balance=balance+? WHERE id=?";
+    public static final String UPDATE_TICKET_STATUS = "UPDATE tickets SET status=? where id=?";
+    public static final String GET_SHOWTIME_TICKETS = "SELECT * FROM tickets WHERE showTimeId=?";
 
     /**
      * Returns User object based on SQL statement and search parameter.
@@ -93,7 +94,24 @@ public class DBManager {
                 user = extractUser(resultSet);
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage(),ex);
+            logger.error(ex.getMessage(), ex);
+            throw new DBException();
+        }
+        return user;
+    }
+
+    public User findUserById(Long id) throws DBException {
+        User user = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_USER_BY_ID)) {
+
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                user = extractUser(resultSet);
+            }
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage(), ex);
             throw new DBException();
         }
         return user;
@@ -141,7 +159,7 @@ public class DBManager {
      */
     public User insertUser(User user) throws DBException {
         try (Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS)) {
 
 
             preparedStatement.setString(1, user.getEmail());
@@ -157,7 +175,7 @@ public class DBManager {
             }
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
         return user;
@@ -180,6 +198,7 @@ public class DBManager {
         user.setLogin(resultSet.getString("login"));
         user.setPassword(resultSet.getString("password"));
         user.setRole(resultSet.getString("role"));
+        user.setBalance(resultSet.getLong("balance"));
         return user;
     }
 
@@ -225,7 +244,7 @@ public class DBManager {
             } catch (SQLException s) {
                 s.printStackTrace();
             }
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
     }
@@ -240,7 +259,7 @@ public class DBManager {
     public List<Showtime> getShowtimeForDate(Date date) throws DBException {
         List<Showtime> showtimeList = new ArrayList<>();
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_DATE)){
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_DATE)) {
 
             preparedStatement.setDate(1, date);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -249,7 +268,7 @@ public class DBManager {
                 showtimeList.add(showtime);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
         return showtimeList;
@@ -265,7 +284,7 @@ public class DBManager {
     public List<Showtime> getShowtimeForFilm(Long filmId) throws DBException {
         List<Showtime> showtimeList = new ArrayList<>();
         try (Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_FILM_ID)){
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_FILM_ID)) {
 
             preparedStatement.setLong(1, filmId);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -275,7 +294,7 @@ public class DBManager {
                 showtimeList.add(showtime);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
 
@@ -293,17 +312,14 @@ public class DBManager {
     public Showtime getShowTime(Long id) throws DBException {
         Showtime showtime = null;
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_ID)){
-
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIME_BY_ID)) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 showtime = extractShowtime(resultSet);
             }
-
-
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
         return showtime;
@@ -316,17 +332,46 @@ public class DBManager {
      * @see Showtime,DBManager
      */
     public void cancelShowtime(Long id) throws DBException {
-        try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(CANCEL_SHOWTIME_BY_ID)){
-
-            preparedStatement.setLong(1, id);
-            preparedStatement.execute();
-
+        Connection connection = null;
+        try {
+            connection = connectionPool.getConnection();
+            connection.setAutoCommit(false);
+            Showtime showtime = getShowTime(id);
+            PreparedStatement preparedStatementCancelShowtime = connection.prepareStatement(CANCEL_SHOWTIME_BY_ID);
+            preparedStatementCancelShowtime.setLong(1, id);
+            preparedStatementCancelShowtime.execute();
+            PreparedStatement preparedStatementShowtimeTickets = connection.prepareStatement(GET_SHOWTIME_TICKETS);
+            preparedStatementShowtimeTickets.setLong(1, showtime.getId());
+            ResultSet resultSet = preparedStatementShowtimeTickets.executeQuery();
+            List<Ticket> ticketList = new ArrayList<>();
+            while (resultSet.next()) {
+                ticketList.add(extractTicket(resultSet));
+            }
+            if (!ticketList.isEmpty()) {
+                for (Ticket t : ticketList) {
+                    if (!Objects.equals(t.getStatus(), "refunded")) {
+                        PreparedStatement preparedStatementUserBalance = connection.prepareStatement(UPDATE_USER_BALANCE);
+                        preparedStatementUserBalance.setLong(1, 75L);
+                        preparedStatementUserBalance.setLong(2, t.getUserId());
+                        preparedStatementUserBalance.execute();
+                    }
+                    PreparedStatement preparedStatementTicketStatus = connection.prepareStatement(UPDATE_TICKET_STATUS);
+                    preparedStatementTicketStatus.setString(1, "canceled");
+                    preparedStatementTicketStatus.setLong(2, t.getId());
+                    preparedStatementTicketStatus.execute();
+                }
+            }
+            connection.commit();
         } catch (SQLException e) {
-
-            logger.error(e.getMessage(),e);
+            try {
+                connection.rollback();
+            } catch (SQLException s) {
+                s.printStackTrace();
+            }
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
+
     }
 
     /**
@@ -337,7 +382,7 @@ public class DBManager {
      */
     public void insertFilm(Film film) throws DBException {
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_FILM)){
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_FILM)) {
 
             preparedStatement.setString(1, film.getName());
             preparedStatement.setString(2, film.getDescription());
@@ -364,7 +409,7 @@ public class DBManager {
     public Film getFilm(Long id) {
         Film film = new Film();
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_FILM_BY_ID)){
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_FILM_BY_ID)) {
 
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -372,9 +417,26 @@ public class DBManager {
                 film = extractFilm(resultSet);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return film;
+    }
+
+    public Long getUserBalance(Long userId) throws DBException {
+        Long balance = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_USER_BY_ID)) {
+            preparedStatement.setLong(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                balance = resultSet.getLong("balance");
+            }
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            throw new DBException();
+        }
+        return balance;
     }
 
     /**
@@ -386,14 +448,14 @@ public class DBManager {
     public List<Film> getAllFilms() throws DBException {
         List<Film> filmList = new ArrayList<>();
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_FILMS)){
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_FILMS)) {
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 filmList.add(extractFilm(resultSet));
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
         return filmList;
@@ -434,20 +496,19 @@ public class DBManager {
         showtime.setStatus(resultSet.getString("show_times.status"));
         showtime.setStartTime(resultSet.getTime("startTime"));
         showtime.setEndTime(resultSet.getTime("endTime"));
-        if(Objects.equals(showtime.getStatus(), "planned") &&
-                (showtime.getDate().compareTo(Date.valueOf(LocalDate.now()))<0
-                        ||(showtime.getDate().compareTo(Date.valueOf(LocalDate.now()))==0 && showtime.getEndTime().getTime()<Time.valueOf(LocalTime.now()).getTime()))){
+        if (Objects.equals(showtime.getStatus(), "planned") &&
+                (showtime.getDate().compareTo(Date.valueOf(LocalDate.now())) < 0
+                        || (showtime.getDate().compareTo(Date.valueOf(LocalDate.now())) == 0 && showtime.getEndTime().getTime() < Time.valueOf(LocalTime.now()).getTime()))) {
             showtime.setStatus("finished");
         }
         TreeMap<String, String> seatMap = new TreeMap<>();
-        int counter=0;
-             do {
-                seatMap.put(resultSet.getString("seat"), resultSet.getString("seats.status"));
-                counter++;
-            } while (resultSet.next()&&counter<288);
+        int counter = 0;
+        do {
+            seatMap.put(resultSet.getString("seat"), resultSet.getString("seats.status"));
+            counter++;
+        } while (resultSet.next() && counter < 288);
 
         showtime.setSeats(seatMap);
-
 
 
         return showtime;
@@ -460,7 +521,7 @@ public class DBManager {
      * @see Ticket ,DBManager
      */
     public void insertTicket(Ticket ticket) throws DBException {
-        Connection connection =null;
+        Connection connection = null;
         try {
             connection = connectionPool.getConnection();
             connection.setAutoCommit(false);
@@ -470,8 +531,56 @@ public class DBManager {
             preparedStatementForTicket.setString(3, ticket.getSeat());
             preparedStatementForTicket.execute();
             PreparedStatement preparedStatementForSeat = connection.prepareStatement(UPDATE_SEAT_STATUS);
-            preparedStatementForSeat.setString(1, ticket.getSeat());
-            preparedStatementForSeat.setLong(2, ticket.getShowTimeId());
+            preparedStatementForSeat.setString(1, "occupied");
+            preparedStatementForSeat.setString(2, ticket.getSeat());
+            preparedStatementForSeat.setLong(3, ticket.getShowTimeId());
+            preparedStatementForSeat.execute();
+            PreparedStatement preparedStatementForUserBalance = connection.prepareStatement(UPDATE_USER_BALANCE);
+            preparedStatementForUserBalance.setLong(1, -75L);
+            preparedStatementForUserBalance.setLong(2, ticket.getUserId());
+            preparedStatementForUserBalance.execute();
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException s) {
+                s.printStackTrace();
+            }
+            logger.error(e.getMessage(), e);
+            throw new DBException();
+        }
+    }
+
+    public void updateSeatStatus(Long showtimeId, String seat, String status) throws DBException {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SEAT_STATUS)) {
+            preparedStatement.setString(1, status);
+            preparedStatement.setString(2, seat);
+            preparedStatement.setLong(3, showtimeId);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            throw new DBException();
+        }
+    }
+
+    public void refundTicket(Ticket ticket) throws DBException {
+        Connection connection = null;
+        try {
+            connection = connectionPool.getConnection();
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatementUserBalance = connection.prepareStatement(UPDATE_USER_BALANCE);
+            preparedStatementUserBalance.setLong(1, 75L);
+            preparedStatementUserBalance.setLong(2, ticket.getUserId());
+            preparedStatementUserBalance.execute();
+            PreparedStatement preparedStatementTicketStatus = connection.prepareStatement(UPDATE_TICKET_STATUS);
+            preparedStatementTicketStatus.setString(1, "refunded");
+            preparedStatementTicketStatus.setLong(2, ticket.getId());
+            preparedStatementTicketStatus.execute();
+            PreparedStatement preparedStatementForSeat = connection.prepareStatement(UPDATE_SEAT_STATUS);
+            preparedStatementForSeat.setString(1, "vacant");
+            preparedStatementForSeat.setString(2, ticket.getSeat());
+            preparedStatementForSeat.setLong(3, ticket.getShowTimeId());
             preparedStatementForSeat.execute();
             connection.commit();
         } catch (SQLException e) {
@@ -480,7 +589,7 @@ public class DBManager {
             } catch (SQLException s) {
                 s.printStackTrace();
             }
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
     }
@@ -495,7 +604,7 @@ public class DBManager {
     public Ticket getTicket(Long id) throws DBException {
         Ticket ticket = new Ticket();
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_TICKET_BY_ID)){
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_TICKET_BY_ID)) {
 
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -503,7 +612,7 @@ public class DBManager {
                 ticket = extractTicket(resultSet);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
         return ticket;
@@ -518,14 +627,14 @@ public class DBManager {
     public List<Showtime> getPlannedShowtimes() throws DBException {
         List<Showtime> showtimeList = new ArrayList<>();
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_PLANNED_SHOWTIMES)){
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_PLANNED_SHOWTIMES)) {
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 showtimeList.add(extractShowtime(resultSet));
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
         if (showtimeList.isEmpty()) {
@@ -545,7 +654,7 @@ public class DBManager {
     public String getSeatStatus(String key, Long showtimeId) throws DBException {
         String status = null;
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_SEAT_STATUS)){
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_SEAT_STATUS)) {
 
             preparedStatement.setString(1, key);
             preparedStatement.setLong(2, showtimeId);
@@ -554,7 +663,7 @@ public class DBManager {
                 status = resultSet.getString("status");
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
         return status;
@@ -570,18 +679,47 @@ public class DBManager {
     public List<Ticket> getUserTickets(Long userId) throws DBException {
         List<Ticket> ticketList = new ArrayList<>();
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_USERS_TICKETS)){
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_USERS_TICKETS)) {
 
             preparedStatement.setLong(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 ticketList.add(extractTicket(resultSet));
             }
+
+            ticketList.sort((o2, o1) -> {
+                if (Objects.equals(o1.getStatus(), "purchased") && (Objects.equals(o2.getStatus(), "canceled") || Objects.equals(o2.getStatus(), "refunded"))) {
+                    return 1;
+                }
+                if (Objects.equals(o1.getStatus(), "refunded") && Objects.equals(o2.getStatus(), "canceled")) {
+                    return 1;
+                }
+                if (Objects.equals(o1.getStatus(), "refunded") && Objects.equals(o2.getStatus(), "purchased")) {
+                    return -1;
+                }
+                if (Objects.equals(o1.getStatus(), "canceled") && (Objects.equals(o2.getStatus(), "refunded") || Objects.equals(o2.getStatus(), "purchased"))) {
+                    return -1;
+                }
+                return (int) (o1.getId() - o2.getId());
+            });
+
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
         return ticketList;
+    }
+
+    public void updateUserBalance(Long id, Long balance) throws DBException {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_USER_BALANCE)) {
+            preparedStatement.setLong(1, balance);
+            preparedStatement.setLong(2, id);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            throw new DBException();
+        }
     }
 
     /**
@@ -597,6 +735,7 @@ public class DBManager {
         ticket.setUserId(resultSet.getLong("userId"));
         ticket.setShowTimeId(resultSet.getLong("showTimeId"));
         ticket.setSeat(resultSet.getString("seat"));
+        ticket.setStatus(resultSet.getString("status"));
         return ticket;
     }
 
@@ -611,7 +750,7 @@ public class DBManager {
         List<Showtime> showtimeList = new ArrayList<>();
         Date lastDay = Date.valueOf(firstDay.toLocalDate().plusMonths(1));
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIMES_FOR_MONTH)){
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIMES_FOR_MONTH)) {
 
             preparedStatement.setDate(1, firstDay);
             preparedStatement.setDate(2, lastDay);
@@ -620,7 +759,7 @@ public class DBManager {
                 showtimeList.add(extractShowtime(resultSet));
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
         return showtimeList;
@@ -639,7 +778,7 @@ public class DBManager {
         long dateLong = date.getTime();
         for (int i = 0; i < 7; i++) {
             try (Connection connection = connectionPool.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIMES_FOR_WEEK)){
+                 PreparedStatement preparedStatement = connection.prepareStatement(GET_SHOWTIMES_FOR_WEEK)) {
                 List<Showtime> showtimeList = new ArrayList<>();
 
                 preparedStatement.setDate(1, new Date(dateLong));
@@ -650,7 +789,7 @@ public class DBManager {
                 showtimeList.sort((o1, o2) -> (int) (o1.getStartTime().getTime() - o2.getStartTime().getTime()));
                 weekList.add(showtimeList);
             } catch (SQLException e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
                 throw new DBException();
             }
             dateLong = dateLong + 86_400_000;
@@ -667,14 +806,14 @@ public class DBManager {
         LocalDate localDate = LocalDate.now();
         LocalTime localTime = LocalTime.now();
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PAST_SHOWTIMES)){
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PAST_SHOWTIMES)) {
 
             preparedStatement.setDate(1, Date.valueOf(localDate));
             preparedStatement.setDate(2, Date.valueOf(localDate));
             preparedStatement.setTime(3, Time.valueOf(localTime));
             preparedStatement.execute();
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new DBException();
         }
     }

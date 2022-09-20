@@ -11,7 +11,8 @@ CREATE TABLE USERS
     surname      VARCHAR(70) NOT NULL,
     login        VARCHAR(30) NOT NULL UNIQUE,
     password     VARCHAR(60) NOT NULL,
-    role         VARCHAR(15) NOT NULL
+    role         VARCHAR(15) NOT NULL,
+    balance      BIGINT
 );
 CREATE TABLE SHOW_TIMES
 (
@@ -39,7 +40,8 @@ CREATE TABLE TICKETS
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     userId     BIGINT NOT NULL REFERENCES USERS (id),
     showTimeId BIGINT NOT NULL REFERENCES SHOW_TIMES (id),
-    seat       VARCHAR(20)
+    seat       VARCHAR(20),
+    status     VARCHAR(20)
 );
 CREATE TABLE SEATS
 (

@@ -50,5 +50,32 @@ public class UserService {
         }
     }
 
+    public User findUserById(Long id){
+        try {
+            return dbManager.findUserById(id);
+        }catch (DBException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
+    public void updateBalance(Long id,Long balance){
+        try {
+            dbManager.updateUserBalance(id,balance);
+        } catch (DBException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
+    public Long getUserBalance(Long userId){
+        try {
+         return dbManager.getUserBalance(userId);
+        }catch (DBException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
 
 }

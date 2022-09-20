@@ -158,10 +158,20 @@
             <c:forEach items="${showtimeList}" var="showtime">
 
                 <tr>
-                    <td><a href="${pageContext.request.contextPath }/ShowtimePage?id=${showtime.id}">
-                        <c:forEach items="${filmList}" var="film">
-                            <c:if test="${film.id==showtime.filmId}">${film.name}</c:if>
-                        </c:forEach></a></td>
+                    <td>
+                        <c:if test="${showtime.status!='finished'}">
+                            <a href="${pageContext.request.contextPath }/ShowtimePage?id=${showtime.id}">
+                                <c:forEach items="${filmList}" var="film">
+                                    <c:if test="${film.id==showtime.filmId}">${film.name}</c:if>
+                                </c:forEach>
+                            </a>
+                        </c:if>
+                        <c:if test="${showtime.status=='finished'}">
+                            <c:forEach items="${filmList}" var="film">
+                                <c:if test="${film.id==showtime.filmId}">${film.name}</c:if>
+                            </c:forEach>
+                        </c:if>
+                    </td>
                     <td>
                             ${showtime.startTime}
                     </td>

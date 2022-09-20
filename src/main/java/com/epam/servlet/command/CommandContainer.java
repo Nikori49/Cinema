@@ -30,6 +30,8 @@ public class CommandContainer {
         commands.put("cancelShowtime", serviceInjectionProcessor.createCommand(CancelShowtimeCommand.class));
         commands.put("purchaseTickets", serviceInjectionProcessor.createCommand(PurchaseTicketsCommand.class));
         commands.put("printStats", serviceInjectionProcessor.createCommand(PrintStatsCommand.class));
+        commands.put("addBalance",serviceInjectionProcessor.createCommand(AddBalanceCommand.class));
+        commands.put("refund",serviceInjectionProcessor.createCommand(RefundTicketCommand.class));
     }
 
     public Command getCommand(String commandName) {

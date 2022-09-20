@@ -48,12 +48,17 @@ public class ShowtimePage extends HttpServlet {
         Showtime showtime = null;
         showtime = showtimeService.getShowtime(Long.valueOf(showtimeId));
 
-
-
         if (showtime == null) {
             response.sendRedirect("index.jsp");
             return;
         }
+
+        if (Objects.equals(showtime.getStatus(), "finished") || Objects.equals(showtime.getStatus(), "canceled")) {
+            response.sendRedirect("index.jsp");
+            return;
+        }
+
+
         Film film = null;
         film = filmService.getFilm(showtime.getFilmId());
         TreeMap<String, String> seats = showtime.getSeats();
@@ -106,7 +111,7 @@ public class ShowtimePage extends HttpServlet {
                 "            <li><a href=\"films.jsp\">" + resourceBundle.getString("label.films") + "</a></li>\n" +
                 "            <li class=\"active\"><a href=\"schedule.jsp\">" + resourceBundle.getString("label.schedule") + "</a></li>\n");
         if (Objects.equals(userRole, "manager")) {
-            out.write("<li><a href=\"manager.jsp\">" + resourceBundle.getString("label.managerWorkplace") + "></a></li>\n");
+            out.write("<li><a href=\"manager.jsp\">" + resourceBundle.getString("label.managerWorkplace") + "</a></li>\n");
         }
         out.write("</ul>\n");
         out.write("<ul class=\"nav navbar-nav navbar-right\">\n");
@@ -205,6 +210,7 @@ public class ShowtimePage extends HttpServlet {
 
         int counter = 1;
         for (String s : seatList) {
+
 
             out.write("<td><input class=\"checkbox-inline\" ");
             if (Objects.equals(seats.get(s), "occupied")) {

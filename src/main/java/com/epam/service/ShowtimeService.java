@@ -106,5 +106,14 @@ public class ShowtimeService {
         }
     }
 
+    public void updateSeatStatus(Long showtimeId,String seat,String status){
+        try {
+            dbManager.updateSeatStatus(showtimeId,seat,status);
+        } catch (DBException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
 
 }

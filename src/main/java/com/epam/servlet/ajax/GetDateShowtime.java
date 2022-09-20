@@ -9,6 +9,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.*;
 
@@ -41,11 +42,16 @@ public class GetDateShowtime extends HttpServlet {
 
             Date date = Date.valueOf(stringDate);
 
-            List<Showtime> showtimeList=new ArrayList<>();
+            List<Showtime> showtimeList = new ArrayList<>();
             if (!Objects.equals(type, "stats")) {
                 showtimeList = showtimeService.getShowtimeForDate(date);
                 showtimeList.removeIf(showtime -> Objects.equals(showtime.getStatus(), "canceled") || Objects.equals(showtime.getStatus(), "finished"));
-                showtimeList.sort((o1, o2) -> (int) (o1.getStartTime().getTime() - o2.getStartTime().getTime()));
+                showtimeList.sort((o1, o2) -> {
+                    if (o1.getDate().compareTo(o2.getDate()) == 0) {
+                        return (int) (o1.getStartTime().getTime() - o2.getStartTime().getTime());
+                    }
+                    return o1.getDate().compareTo(o2.getDate());
+                });
             }
             if (Objects.equals(type, "stats")) {
                 showtimeList = showtimeService.getShowtimeForMonth(date);
@@ -146,6 +152,21 @@ public class GetDateShowtime extends HttpServlet {
                             .append(resourceBundle.getString("label.status"))
                             .append("</th>\n")
                             .append("</tr>\n");
+                    int intPage = 0;
+                    String page = request.getParameter("page");
+                    if (page != null) {
+                        intPage = Integer.parseInt(page);
+                    }
+                    int length = showtimeList.size();
+                    int pageCount = (int) Math.ceil(length / new BigDecimal(7).doubleValue());
+                    if (length > 7) {
+                        if(intPage+1==pageCount){
+                            showtimeList = showtimeList.subList(intPage * 7, length);
+                        }else {
+                            showtimeList = showtimeList.subList(intPage * 7, intPage * 7 + 7);
+                        }
+
+                    }
                     for (Showtime s : showtimeList) {
                         String filmName = "";
                         for (Film f : filmList) {
@@ -178,6 +199,19 @@ public class GetDateShowtime extends HttpServlet {
                                 .append(s.getStatus())
                                 .append("</td>\n")
                                 .append("</tr>\n");
+                    }
+                    if (pageCount > 1) {
+                        stringBuilder.append("<div class=\"container\">  \n" +
+                                "  <ul class=\"pagination\">  \n");
+                        for (int i = 0; i < pageCount; i++) {
+                            stringBuilder.append("<li ");
+                            if(i==intPage){
+                                stringBuilder.append("  class=\"active\" ");
+                            }
+                            stringBuilder.append(" ><a href=\"#\" onclick=\"sendDateInfoForStats(" + i + ")\">" + (i + 1) + "</a></li>");
+                        }
+                        stringBuilder.append("  </ul>  \n" +
+                                "</div>  ");
                     }
                     stringBuilder.append("</table>\n" + "<form role=\"presentation\" action=\"controller\" method=\"get\">\n"
                                     + "<input hidden name=\"command\" value=\"printStats\">\n"

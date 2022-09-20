@@ -598,9 +598,25 @@ public class DBManagerTest {
         when(connectionPool.getConnection())
                 .thenReturn(connection);
         String statement = DBManager.CANCEL_SHOWTIME_BY_ID;
+        String statement1 = DBManager.GET_SHOWTIME_BY_ID;
+        String statement2 = DBManager.GET_SHOWTIME_TICKETS;
+        String statement3 = DBManager.UPDATE_USER_BALANCE;
+        String statement4 = DBManager.UPDATE_TICKET_STATUS;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        PreparedStatement preparedStatement1 = mock(PreparedStatement.class);
+        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
+        PreparedStatement preparedStatement3 = mock(PreparedStatement.class);
+        PreparedStatement preparedStatement4 = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement))
                 .thenReturn(preparedStatement);
+        when(connection.prepareStatement(statement1))
+                .thenReturn(preparedStatement1);
+        when(connection.prepareStatement(statement2))
+                .thenReturn(preparedStatement2);
+        when(connection.prepareStatement(statement3))
+                .thenReturn(preparedStatement3);
+        when(connection.prepareStatement(statement4))
+                .thenReturn(preparedStatement4);
         DBManager dbManager = new DBManager(connectionPool);
 
         ShowtimeService showtimeService = new ShowtimeService(dbManager);
@@ -618,14 +634,28 @@ public class DBManagerTest {
         showtime1.setStartTime(Time.valueOf("10:10:10"));
         showtime1.setEndTime(Time.valueOf("12:12:12"));
 
+        Ticket ticket = new Ticket();
+        ticket.setStatus("u");
+        ticket.setId(1L);
+        ticket.setSeat("K2");
+        ticket.setShowTimeId(1L);
+        ticket.setUserId(1L);
+
 
 
         Set<String> stringSet = new Utils().fillSeatMap().keySet();
 
         ResultSet resultSet = mock(ResultSet.class);
+        ResultSet resultSet1 = mock(ResultSet.class);
+
+        when(preparedStatement2.executeQuery()).thenReturn(resultSet1);
+
+
 
         when(resultSet.next())
                 .thenReturn(true,true,false);
+        when(resultSet1.next())
+                .thenReturn(true,false);
 
 
 
@@ -694,11 +724,8 @@ public class DBManagerTest {
                 .thenReturn("vacant");
 
 
-        List<Showtime> showtimeList = new ArrayList<>();
-        showtimeList.add(showtime1);
 
-
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(preparedStatement1.executeQuery()).thenReturn(resultSet);
 
 
 
@@ -849,12 +876,16 @@ public class DBManagerTest {
                 .thenReturn(connection);
         String statement1 = DBManager.INSERT_TICKET;
         String statement2 = DBManager.UPDATE_SEAT_STATUS;
+        String statement3 = DBManager.UPDATE_USER_BALANCE;
         PreparedStatement preparedStatement1 = mock(PreparedStatement.class);
         PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
+        PreparedStatement preparedStatement3 = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement1))
                 .thenReturn(preparedStatement1);
         when(connection.prepareStatement(statement2))
                 .thenReturn(preparedStatement2);
+        when(connection.prepareStatement(statement3))
+                .thenReturn(preparedStatement3);
         DBManager dbManager = new DBManager(connectionPool);
 
         TicketService ticketService = new TicketService(dbManager);
@@ -864,11 +895,7 @@ public class DBManagerTest {
         ticket.setId(1L);
         ticket.setUserId(1L);
         ticket.setShowTimeId(1L);
-
-
-
-
-
+        ticket.setStatus("test");
 
         Assertions.assertDoesNotThrow(()->ticketService.createTicket(ticket));
     }

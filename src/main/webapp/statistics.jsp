@@ -43,12 +43,14 @@
             document.location.reload();
         }
         let request;
-        function sendDateInfoForStats() {
-
-
+        function sendDateInfoForStats(p) {
             const v = document.dateSelectorForm.date.value;
 
-            const url = "${pageContext.request.contextPath }/GetDateShowtime?date=" + v + "&type=stats";
+            let url = "${pageContext.request.contextPath }/GetDateShowtime?date=" + v + "&type=stats";
+
+            if(p!=null){
+                url=url+"&page="+p
+            }
 
             if(window.XMLHttpRequest){
                 request=new XMLHttpRequest();
@@ -124,7 +126,6 @@
         viewMode: "months",
         minViewMode: "months"
     }).on('changeDate', function (){
-
         sendDateInfoForStats()
     })
 

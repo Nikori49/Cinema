@@ -1,3 +1,4 @@
+<%--@elvariable id="userService" type="com.epam.service.UserService"--%>
 <%--
   Created by IntelliJ IDEA.
   User: yohoh
@@ -74,23 +75,41 @@
     </div>
 </nav>
 <div class="container">
+    <fmt:message key="label.yourBalance"/> ${userService.getUserBalance(sessionScope.get('loggedUser').id)}
+<fmt:message key="label.hrn"/>
+    <form role="form" action="controller" method="post">
+        <input name="command" value="addBalance" hidden>
+        <select name="sum">
+            <option class="active" value="75">75</option>
+            <option value="150">150</option>
+            <option value="300">300</option>
+            <option value="1000">1000</option>
+            <option value="3000">3000</option>
+            <option value="10000">10000</option>
+        </select>
+        <input class="btn btn-success btn-sm" type="submit" value="<fmt:message key="label.addBalance"/>">
+    </form>
+</div>
+<div class="container">
     <h2><fmt:message key="label.yourTickets"/></h2>
     <%--@elvariable id="userTickets" type="java.util.List<com.epam.dao.entity.Ticket>"--%>
 
-    <c:if test="${userTickets==null}">
+    <c:if test="${empty userTickets}">
         <fmt:message key="label.noTickets"/>
     </c:if>
-    <c:if test="${userTickets!=null}">
+    <c:if test="${!empty userTickets}">
         <c:forEach items="${userTickets}" var="ticket">
             <div class="container">
                 <div class="panel <c:forEach items="${showtimeList}" var="showtime">
                                 <c:if test="${showtime.id==ticket.showTimeId}">
-                                    <c:if test="${showtime.status=='finished'}">
+                                    <c:if test="${showtime.status=='finished' && ticket.status!='refunded'}">
                                      panel-success </c:if>
                                      <c:if test="${showtime.status=='canceled'}">
                                      panel-danger </c:if>
-                                     <c:if test="${showtime.status=='planned'}">
+                                     <c:if test="${showtime.status=='planned' && ticket.status!='refunded'}">
                                      panel-info </c:if>
+                                     <c:if test="${(showtime.status=='planned' || showtime.status=='finished')  && ticket.status=='refunded'}">
+                                     panel-warning </c:if>
                                 </c:if>
                             </c:forEach> ">
                     <div class="panel-heading">
@@ -104,7 +123,8 @@
                                         </c:if>
                                     </c:forEach>
                                 </c:if>
-                            </c:forEach></h3>
+                            </c:forEach>
+                        </h3>
                     </div>
                     <div class="panel-body">
                         <c:forEach items="${showtimeList}" var="showtime">
@@ -113,7 +133,15 @@
                                     key="label.startEndTime"/>:${showtime.startTime}-${showtime.endTime}  <fmt:message
                                     key="label.seat"/>:${ticket.seat}
                             </c:if>
+                            <c:if test="${showtime.id==ticket.showTimeId && ticket.status=='purchased' && showtime.status=='planned'}">
+                                <form role="form" action="controller" method="post">
+                                    <input type="hidden" name="command" value="refund">
+                                    <input type="hidden" name="id" value="${ticket.id}">
+                                    <input class="btn-danger btn btn-sm" type="submit" value="<fmt:message key="label.refund"/>">
+                                </form>
+                            </c:if>
                         </c:forEach>
+
                     </div>
                 </div>
             </div>

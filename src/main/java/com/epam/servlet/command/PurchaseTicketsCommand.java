@@ -7,6 +7,7 @@ import com.epam.dao.entity.Showtime;
 import com.epam.dao.entity.Ticket;
 import com.epam.dao.entity.User;
 import com.epam.service.TicketService;
+import com.epam.service.UserService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,11 +27,13 @@ import java.util.Set;
 public class PurchaseTicketsCommand implements Command {
     private final TicketService ticketService;
     private final ShowtimeService showtimeService;
+    private final UserService userService;
 
     @MyInject
-    public PurchaseTicketsCommand(TicketService ticketService, ShowtimeService showtimeService) {
+    public PurchaseTicketsCommand(TicketService ticketService, ShowtimeService showtimeService, UserService userService) {
         this.ticketService = ticketService;
         this.showtimeService = showtimeService;
+        this.userService = userService;
     }
 
     @Override
@@ -53,6 +56,9 @@ public class PurchaseTicketsCommand implements Command {
             System.out.println(1);
             return "error.jsp";
         }
+        if (Objects.equals(showtime.getStatus(), "finished") || Objects.equals(showtime.getStatus(), "canceled") ){
+            return "error.jsp";
+        }
         List<String> seatsPurchased = new ArrayList<>();
         Set<String> keySet = new  Utils().fillSeatMap().keySet();
         for (String s : keySet) {
@@ -62,12 +68,11 @@ public class PurchaseTicketsCommand implements Command {
         if (seatsPurchased.isEmpty()) {
             return "index.jsp";
         }
+        if (user.getBalance()-(seatsPurchased.size()*75L)<0){
+            return "error.jsp";
+        }
         for (String s : seatsPurchased) {
             if (Objects.equals(showtimeService.getSeatStatus(s, showtime.getId()), "occupied")) {
-                System.out.println(s);
-                System.out.println(showtime.getId());
-                System.out.println(showtimeService.getSeatStatus(s,showtime.getId()));
-                System.out.println(2);
                 return "error.jsp";
             }
         }
@@ -81,8 +86,7 @@ public class PurchaseTicketsCommand implements Command {
 
         }
 
-
-
+        request.getSession().setAttribute("loggedUser",userService.findUserById(user.getId()));
 
         return "client.jsp";
     }

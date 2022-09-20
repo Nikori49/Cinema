@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -80,7 +81,7 @@ public class FilmPageTest {
                 "        <iframe  class=\"embed-responsive\" src=\"https://www.youtube.com/embed/12345678901\"></iframe>\n" +
                 "    </div>\n" +
                 "</div><div class=\"container\">\n" +
-                "    <img width=\"400\" height=\"600\" class=\"img-responsive\" alt=\"Missing poster\" src=\"testPath\">\n" +
+                "    <img  alt=\"Missing poster\" src=\"testPath\" width=\"400\" height=\"600\">\n" +
                 "    <h3>testName</h3>\n" +
                 "    <div class=\"container\">\n" +
                 "        <h5>Director</h5>\n" +
@@ -99,7 +100,7 @@ public class FilmPageTest {
                 "        <div class=\"well\">testDesc</div>\n" +
                 "    </div>\n" +
                 "</div><div class=\"container\"><label for=\"showtime\">Available showtimes</label><form id=\"showtime\" role=\"presentation\">\n" +
-                "<button class=\"btn btn-block btn-info\" formmethod=\"get\" formaction=\"null/ShowtimePage\" name=\"id\" value=\"1\">2222-08-12  10:10:10-12:12:12</button>\n" +
+                "<button class=\"btn btn-block btn-info\" formmethod=\"get\" formaction=\"null/ShowtimePage\" name=\"id\" value=\"1\">"+LocalDate.now()+"  10:10:10-12:12:12</button>\n" +
                 "</form></div></body>";
 
         FilmService filmService = mock(FilmService.class);
@@ -132,7 +133,7 @@ public class FilmPageTest {
 
 
         Showtime showtime1 = new Showtime();
-        showtime1.setDate(Date.valueOf("2222-08-12"));
+        showtime1.setDate(Date.valueOf(LocalDate.now()));
         showtime1.setId(1L);
         showtime1.setStatus("planned");
         TreeMap<String,String> treeMap = new TreeMap<>();

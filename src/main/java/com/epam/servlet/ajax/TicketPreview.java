@@ -3,8 +3,10 @@ package com.epam.servlet.ajax;
 import com.epam.dao.Utils;
 import com.epam.dao.entity.Film;
 import com.epam.dao.entity.Showtime;
+import com.epam.dao.entity.User;
 import com.epam.service.FilmService;
 import com.epam.service.ShowtimeService;
+import com.epam.service.UserService;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -23,6 +25,7 @@ public class TicketPreview extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String showtimeId = request.getParameter("id");
+        User user = (User) request.getSession().getAttribute("loggedUser");
         List<String> seatsChecked = new ArrayList<>();
         Set<String> keySet = new Utils().fillSeatMap().keySet();
         for (String s : keySet) {
@@ -32,6 +35,8 @@ public class TicketPreview extends HttpServlet {
         }
         ShowtimeService showtimeService = (ShowtimeService) request.getServletContext().getAttribute("showtimeService");
         FilmService filmService = (FilmService) request.getServletContext().getAttribute("filmService");
+        UserService userService = (UserService) request.getServletContext().getAttribute("userService");
+
 
         Showtime showtime = null;
         showtime = showtimeService.getShowtime(Long.valueOf(showtimeId));
@@ -51,11 +56,38 @@ public class TicketPreview extends HttpServlet {
             Locale locale = new Locale(language);
             ResourceBundle resourceBundle = ResourceBundle.getBundle("General", locale);
             StringBuilder stringBuilder = new StringBuilder();
+            Long totalCost = seatsChecked.toArray().length * 75L;
             stringBuilder.append("<div style=\"width: 50%;\" class=\"well\"><h5>")
                     .append(resourceBundle.getString("label.totalCost"))
-                    .append(seatsChecked.toArray().length * 75)
+                    .append(totalCost)
                     .append(resourceBundle.getString("label.hrn"))
-                    .append("</h5></div>\n");
+                    .append("</h5>");
+
+            Long userBalance = userService.getUserBalance(user.getId());
+
+            stringBuilder.append("<h5>").append(resourceBundle.getString("label.yourBalance")).append(userBalance).append(resourceBundle.getString("label.hrn")).append("</h5>");
+            if(totalCost> userService.getUserBalance(user.getId())){
+                stringBuilder.append("<h5>").append(resourceBundle.getString("label.insufficientFunds")).append("</h5>");
+            }
+            /*stringBuilder.append("<script>" +
+                    "\n" +
+                    "    $(document).ready(function(){\n" +
+                    "        $('[data-toggle=\"popover\"]').popover();\n" +
+                    "    });\n").append("</script>");*/
+            stringBuilder.append("<div style=\"width: 50%; class=\"container\">");
+            stringBuilder.append("<input class=\"btn btn-success\" ");
+            if(totalCost> userBalance){
+                /* stringBuilder.append(" data-toggle=\"popover\" data-placement=\"right\" data-trigger=\"hover\" data-content=\"")
+                        .append(resourceBundle.getString("label.insufficientFunds"))
+                        .append("\" data-original-title=\"\" title=\"\" ");*/
+                stringBuilder.append(" disabled ");
+            }
+            stringBuilder.append(" type=\"submit\" value=\"")
+                    .append(resourceBundle.getString("label.purchaseTickets"))
+                    .append("\">");
+
+            stringBuilder.append("</div>")
+                    .append("</div>\n");
             stringBuilder.append("<div style=\"width: 50%; position: absolute; left: 0%\" class=\"container\">\n");
             for (String s : seatsChecked) {
                 stringBuilder.append("<div class=\"panel panel-info\">\n"
@@ -81,11 +113,7 @@ public class TicketPreview extends HttpServlet {
                         .append("</div>\n");
             }
             stringBuilder.append("</div>");
-            stringBuilder.append("<div style=\"width: 50%; position: absolute; left: 35%; top: 50%\" class=\"container\">");
-            stringBuilder.append("<input class=\"btn btn-success\" type=\"submit\" value=\"")
-                    .append(resourceBundle.getString("label.purchaseTickets"))
-                    .append("\">");
-            stringBuilder.append("</div>");
+
             response.setContentType("text/plain");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(String.valueOf(stringBuilder));

@@ -20,11 +20,12 @@ import java.util.Objects;
  * @version 1.0
  * @see DBManager
  */
-public class Ticket extends Entity{
+public class Ticket extends Entity {
     Long id;
     Long userId;
     Long showTimeId;
     String seat;
+    String status;
 
     public Ticket() {
     }
@@ -36,6 +37,7 @@ public class Ticket extends Entity{
                 ", userId=" + userId +
                 ", showTimeId=" + showTimeId +
                 ", seat='" + seat + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 
@@ -71,16 +73,24 @@ public class Ticket extends Entity{
         this.seat = seat;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Ticket ticket = (Ticket) o;
-        return Objects.equals(id, ticket.id) && Objects.equals(userId, ticket.userId) && Objects.equals(showTimeId, ticket.showTimeId) && Objects.equals(seat, ticket.seat);
+        return Objects.equals(id, ticket.id) && Objects.equals(userId, ticket.userId) && Objects.equals(showTimeId, ticket.showTimeId) && Objects.equals(seat, ticket.seat) && Objects.equals(status, ticket.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, showTimeId, seat);
+        return Objects.hash(id, userId, showTimeId, seat, status);
     }
 }

@@ -42,6 +42,15 @@ public class TicketService {
         }
     }
 
+    public void refundTicket(Ticket ticket){
+        try {
+            dbManager.refundTicket(ticket);
+        } catch (DBException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
 
 
 

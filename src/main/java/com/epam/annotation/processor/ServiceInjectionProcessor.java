@@ -19,7 +19,7 @@ public class ServiceInjectionProcessor {
         try {
 
             URL url = Thread.currentThread().getContextClassLoader().getResource(packagePath.replace(".", "/"));
-            System.out.println(url);
+
             File file = new File(url.toURI());
 
             List<Class<?>> classList = new ArrayList<>();

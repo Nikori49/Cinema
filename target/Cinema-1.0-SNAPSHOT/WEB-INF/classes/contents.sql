@@ -1,21 +1,21 @@
 USE cinema;
 
 INSERT INTO users
-VALUES (DEFAULT,'manager2@gmail.com','+3809999999','Менеджер','Просто менеджер','Manager',MD5('managerpass1'),'manager');
+VALUES (DEFAULT,'manager2@gmail.com','+3809999999','Менеджер','Просто менеджер','Manager',MD5('managerpass1'),'manager',0);
 
 
 INSERT INTO users
-VALUES (DEFAULT,'clientno1@gmail.com','+3801111111','Перший','Клієнт','ClientN1',MD5('clientpass1'),'client');
+VALUES (DEFAULT,'clientno1@gmail.com','+3801111111','Перший','Клієнт','ClientN1',MD5('clientpass1'),'client',0);
 
 
 INSERT INTO users
-VALUES (DEFAULT,'clientno2@gmail.com','+3802222222','Другий','Клієнт','ClientN2',MD5('clientpass2'),'client');
+VALUES (DEFAULT,'clientno2@gmail.com','+3802222222','Другий','Клієнт','ClientN2',MD5('clientpass2'),'client',0);
 
 INSERT INTO users
-VALUES (DEFAULT,'clientno3@gmail.com','+3803333333','Third','Client','ClientN3',MD5('clientpass3'),'client');
+VALUES (DEFAULT,'clientno3@gmail.com','+3803333333','Third','Client','ClientN3',MD5('clientpass3'),'client',0);
 
 INSERT INTO users
-VALUES (DEFAULT,'clientno4@gmail.com','+3804444444','Четвертий','Кліент','ClientN4',MD5('clientpass4'),'client');
+VALUES (DEFAULT,'clientno4@gmail.com','+3804444444','Четвертий','Кліент','ClientN4',MD5('clientpass4'),'client',0);
 
 INSERT INTO films
 VALUES (DEFAULT, 'Morbius', 'Its morbin time!', 'Masterpiece', 'posterImages/Morbius_poster', 'Daniel Espinosa', 104,'oZ6iiRrz1SY');

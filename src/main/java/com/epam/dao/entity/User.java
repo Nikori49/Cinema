@@ -33,6 +33,7 @@ public class User extends Entity{
     String login;
     String password;
     String role;
+    Long balance;
 
     public User() {
     }
@@ -126,5 +127,13 @@ public class User extends Entity{
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Long balance) {
+        this.balance = balance;
     }
 }

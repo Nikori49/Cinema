@@ -92,8 +92,11 @@
         </ul>
     </div>
 </nav>
+<div class="container">
+    <h3><fmt:message key="label.error"/></h3>
+    <fmt:message key="label.errorMessage"/>
+</div>
 
-<fmt:message key="label.error"/><fmt:message key="label.errorMessage"/>
 
 
 </body>
