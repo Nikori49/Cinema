@@ -61,7 +61,7 @@ public class PrintStatsCommandTest {
                 "endobj\n" +
                 "4 0 obj\n" +
                 "<<\n" +
-                "/Length 231\n" +
+                "/Length 230\n" +
                 "/Filter /FlateDecode\n" +
                 ">>\n" +
                 "stream\n" +

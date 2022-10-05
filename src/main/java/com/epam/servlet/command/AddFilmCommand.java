@@ -3,12 +3,15 @@ package com.epam.servlet.command;
 import com.epam.annotation.MyInject;
 import com.epam.dao.entity.Film;
 import com.epam.service.FilmService;
+import com.epam.servlet.PosterImages;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Command which execute method validates and inserts Film object into DB.
@@ -72,12 +75,25 @@ public class AddFilmCommand implements Command {
         film.setGenre(filmGenre);
         film.setDirector(filmDirector);
         film.setRunningTime(filmRuntime);
-        film.setPosterImgPath("posterImages/" + filmName + "_poster");
+        film.setPosterImgPath("posterImages/" + filmName + "_poster.jpeg");
         film.setYoutubeTrailerId(youtubeTrailerId);
 
+        String path="";
+        try (InputStream inputStream = PosterImages.class.getClassLoader().getResourceAsStream("app.properties")){
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            path=properties.getProperty("image.directory");
+            //path=path.replaceAll("\\\\","/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        if (path.isEmpty()){
+            throw  new RuntimeException();
+        }
         filmService.createFilm(film);
-        filePart.write("C:\\Users\\yohoh\\Desktop\\JAVA\\Cinema\\src\\main\\webapp\\posterImages\\" + filmName + "_poster");
+
+        filePart.write(path + "\\" + filmName + "_poster.jpeg");
 
         return address;
     }

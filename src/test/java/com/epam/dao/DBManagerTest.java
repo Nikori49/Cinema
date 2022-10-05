@@ -14,6 +14,7 @@ import com.epam.service.TicketService;
 import com.epam.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -1424,6 +1425,24 @@ public class DBManagerTest {
 
 
         Assertions.assertDoesNotThrow(showtimeService::finishPastShowtime);
+    }
+
+    @Test
+    public void updateUserBalanceTest() throws SQLException{
+        ConnectionPool connectionPool = mock(ConnectionPool.class);
+        Connection connection = mock(Connection.class);
+        when(connectionPool.getConnection())
+                .thenReturn(connection);
+        String statement = DBManager.UPDATE_USER_BALANCE;
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(connection.prepareStatement(statement))
+                .thenReturn(preparedStatement);
+        DBManager dbManager = new DBManager(connectionPool);
+
+        UserService userService = new UserService(dbManager);
+
+
+        Assertions.assertDoesNotThrow(() -> userService.updateBalance(1L, 75L));
     }
 
 
