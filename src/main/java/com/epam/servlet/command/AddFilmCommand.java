@@ -79,7 +79,7 @@ public class AddFilmCommand implements Command {
         film.setYoutubeTrailerId(youtubeTrailerId);
 
         String path="";
-        try (InputStream inputStream = PosterImages.class.getClassLoader().getResourceAsStream("app.properties")){
+        try (InputStream inputStream = AddFilmCommand.class.getClassLoader().getResourceAsStream("app.properties")){
             Properties properties = new Properties();
             properties.load(inputStream);
             path=properties.getProperty("image.directory");
