@@ -57,7 +57,7 @@ public class TicketPreview extends HttpServlet {
             ResourceBundle resourceBundle = ResourceBundle.getBundle("General", locale);
             StringBuilder stringBuilder = new StringBuilder();
             Long totalCost = seatsChecked.toArray().length * 75L;
-            stringBuilder.append("<div style=\"width: 50%;\" class=\"well\"><h5>")
+            stringBuilder.append("<div style=\"width: 48.5%;\" class=\"well\"><h5>")
                     .append(resourceBundle.getString("label.totalCost"))
                     .append(totalCost)
                     .append(resourceBundle.getString("label.hrn"))
@@ -74,7 +74,7 @@ public class TicketPreview extends HttpServlet {
                     "    $(document).ready(function(){\n" +
                     "        $('[data-toggle=\"popover\"]').popover();\n" +
                     "    });\n").append("</script>");*/
-            stringBuilder.append("<div style=\"width: 50%; class=\"container\">");
+            stringBuilder.append("<div style=\"width: 45%; class=\"container\">");
             stringBuilder.append("<input class=\"btn btn-success\" ");
             if(totalCost> userBalance){
                 /* stringBuilder.append(" data-toggle=\"popover\" data-placement=\"right\" data-trigger=\"hover\" data-content=\"")

@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -49,6 +51,10 @@ public class AddShowtimeCommand implements Command {
         Date date = Date.valueOf(request.getParameter("date"));
         String time = request.getParameter("startTime") + ":00";
         if (time.equals(":00")) {
+            request.getSession().setAttribute("showtimeError", 1);
+            return "addShowtime.jsp";
+        }
+        if (Objects.equals(date, Date.valueOf(LocalDate.now())) && Time.valueOf(LocalTime.now()).getTime() > Time.valueOf(time).getTime()){
             request.getSession().setAttribute("showtimeError", 1);
             return "addShowtime.jsp";
         }
