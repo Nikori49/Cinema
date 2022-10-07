@@ -82,7 +82,7 @@ public class RegisterCommand implements Command {
         user.setLogin(login);
         user.setPassword(password);
         user.setRole("client");
-        user = userService.createUser(user);
+        user = userService.findUserByLogin(user.getLogin());
         request.getSession().setAttribute("loggedUser", user);
         return "index.jsp";
     }

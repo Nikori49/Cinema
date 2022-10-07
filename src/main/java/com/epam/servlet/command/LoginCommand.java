@@ -60,13 +60,7 @@ public class LoginCommand implements Command {
 
         if (user != null && user.getPassword().equals(passHash)) {
             request.getSession().setAttribute("loggedUser", user);
-            /*if (Objects.equals(user.getRole(), "client")) {
-                try {
-                    request.getSession().setAttribute("userTickets",request.getServletContext().getAttribute("DBManager").getUserTickets(user));
-                } catch (DBException e) {
-                    response.sendRedirect("error.jsp");
-                }
-            }*/
+
             if (Objects.equals(user.getRole(), "manager")) {
                 address = "manager.jsp";
             }

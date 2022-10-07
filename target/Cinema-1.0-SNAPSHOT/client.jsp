@@ -76,7 +76,7 @@
 </nav>
 <div class="container">
     <fmt:message key="label.yourBalance"/> ${userService.getUserBalance(sessionScope.get('loggedUser').id)}
-<fmt:message key="label.hrn"/>
+    <fmt:message key="label.hrn"/>
     <form role="form" action="controller" method="post">
         <input name="command" value="addBalance" hidden>
         <select name="sum">
@@ -126,7 +126,8 @@
                             </c:forEach>
                         </h3>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body container">
+
                         <c:forEach items="${showtimeList}" var="showtime">
                             <c:if test="${showtime.id==ticket.showTimeId}">
                                 <fmt:message key="label.date"/>:${showtime.date}  <fmt:message
@@ -134,12 +135,14 @@
                                     key="label.seat"/>:${ticket.seat}
                             </c:if>
                             <c:if test="${showtime.id==ticket.showTimeId && ticket.status=='purchased' && showtime.status=='planned'}">
-                                <form role="form" action="controller" method="post">
+                                <form style="display: inline;position: relative; left: 55%" class="form-inline" role="form" action="controller" method="post">
                                     <input type="hidden" name="command" value="refund">
                                     <input type="hidden" name="id" value="${ticket.id}">
-                                    <input class="btn-danger btn btn-sm" type="submit" value="<fmt:message key="label.refund"/>">
+                                    <input style="display: inline" class="btn-danger btn btn-sm" type="submit"
+                                           value="<fmt:message key="label.refund"/>">
                                 </form>
                             </c:if>
+
                         </c:forEach>
 
                     </div>

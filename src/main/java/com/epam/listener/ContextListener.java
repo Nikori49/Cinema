@@ -1,9 +1,7 @@
 package com.epam.listener;
 
 import com.epam.annotation.processor.ServiceInjectionProcessor;
-import com.epam.dao.ConnectionPool;
-import com.epam.dao.DBManager;
-import com.epam.dao.Utils;
+import com.epam.dao.*;
 import com.epam.servlet.command.CommandContainer;
 
 
@@ -25,9 +23,9 @@ public class ContextListener implements ServletContextListener{
 
         ServletContext servletContext = servletContextEvent.getServletContext();
 
-        DBManager dbManager = new DBManager(new ConnectionPool());
+        ConnectionPool connectionPool = new ConnectionPool();
 
-        ServiceInjectionProcessor serviceInjectionProcessor = new ServiceInjectionProcessor(dbManager,"com.epam.service");
+        ServiceInjectionProcessor serviceInjectionProcessor = new ServiceInjectionProcessor(new FilmDAO(connectionPool),new TicketDAO(connectionPool),new ShowtimeDAO(connectionPool),new UserDAO(connectionPool),"com.epam.service");
 
 
         serviceInjectionProcessor.getMap().forEach((key,value)->{
@@ -43,16 +41,6 @@ public class ContextListener implements ServletContextListener{
 
 
         servletContext.setAttribute("language", "en");
-        /*try {
-            servletContext.setAttribute("showtimeList", DBManager.getInstance().getPlannedShowtimes());
-        } catch (DBException e) {
-            servletContext.getRequestDispatcher("error.jsp");
-        }
-        try {
-            servletContext.setAttribute("thisWeekShowtimeList", DBManager.getInstance().getShowtimesForWeek());
-        } catch (DBException e) {
-            servletContext.getRequestDispatcher("error.jsp");
-        }*/
 
         servletContext.setAttribute("utils", new Utils());
         servletContext.setAttribute("schedulePage", 0);

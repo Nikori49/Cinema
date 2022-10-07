@@ -1,7 +1,8 @@
 package com.epam.service;
 
 import com.epam.annotation.Service;
-import com.epam.dao.DBManager;
+
+import com.epam.dao.TicketDAO;
 import com.epam.dao.entity.Ticket;
 import com.epam.dao.exception.DBException;
 
@@ -9,15 +10,15 @@ import java.util.List;
 
 @Service
 public class TicketService {
-    private final DBManager dbManager;
+    private final TicketDAO ticketDAO;
 
-    public TicketService(DBManager dbManager) {
-        this.dbManager = dbManager;
+    public TicketService(TicketDAO ticketDAO) {
+        this.ticketDAO = ticketDAO;
     }
     public void createTicket(Ticket ticket)  {
 
         try {
-            dbManager.insertTicket(ticket);
+            ticketDAO.insert(ticket);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -26,7 +27,7 @@ public class TicketService {
 
     public List<Ticket> getUserTickets(Long userId){
         try {
-            return dbManager.getUserTickets(userId);
+            return ticketDAO.getUserTickets(userId);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -35,7 +36,7 @@ public class TicketService {
 
     public Ticket getTicket(Long ticketId){
         try {
-            return dbManager.getTicket(ticketId);
+            return ticketDAO.findById(ticketId);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -44,7 +45,7 @@ public class TicketService {
 
     public void refundTicket(Ticket ticket){
         try {
-            dbManager.refundTicket(ticket);
+            ticketDAO.refundTicket(ticket);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();

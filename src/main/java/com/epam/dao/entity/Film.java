@@ -1,7 +1,5 @@
 package com.epam.dao.entity;
 
-import com.epam.dao.DBManager;
-
 import java.util.Objects;
 
 /**
@@ -21,7 +19,7 @@ import java.util.Objects;
  *
  * @author Mykyta Ponomarenko
  * @version 1.0
- * @see DBManager
+ * @see com.epam.dao.FilmDAO
  */
 public class Film extends Entity{
     Long id;

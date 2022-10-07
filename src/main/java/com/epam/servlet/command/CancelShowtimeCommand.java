@@ -29,16 +29,7 @@ public class CancelShowtimeCommand implements Command {
             Long id = Long.valueOf(stringId);
             showtimeService.cancelShowtime(id);
         }
-        /*try {
-            request.getServletContext().setAttribute("showtimeList", DBManager.getInstance().getPlannedShowtimes());
-        } catch (DBException e) {
-            return "error.jsp";
-        }
-        try {
-            request.getServletContext().setAttribute("thisWeekShowtimeList", DBManager.getInstance().getShowtimesForWeek());
-        } catch (DBException e) {
-            return "error.jsp";
-        }*/
+
 
 
         return "manager.jsp";

@@ -2,7 +2,7 @@ package com.epam.annotation.processor;
 
 import com.epam.annotation.MyInject;
 import com.epam.annotation.Service;
-import com.epam.dao.DBManager;
+import com.epam.dao.*;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -10,12 +10,13 @@ import java.net.URL;
 import java.util.*;
 
 public class ServiceInjectionProcessor {
-    private final DBManager dbManager;
+
+
 
     private final HashMap<Class<?>, Object> map = new HashMap();
 
-    public ServiceInjectionProcessor(DBManager dbManager,String packagePath) {
-        this.dbManager = dbManager;
+    public ServiceInjectionProcessor(FilmDAO filmDAO,TicketDAO ticketDAO,ShowtimeDAO showtimeDAO,UserDAO userDAO,String packagePath) {
+
         try {
 
             URL url = Thread.currentThread().getContextClassLoader().getResource(packagePath.replace(".", "/"));
@@ -29,8 +30,48 @@ public class ServiceInjectionProcessor {
 
             for (Class<?> c : classList) {
                 if (c.isAnnotationPresent(Service.class)) {
-                    Constructor<?> constructor = c.getConstructor(DBManager.class);
-                    map.put(c, constructor.newInstance(dbManager));
+                    Constructor<?> constructor = null;
+                    int flag=0;
+                    try {
+                        constructor = c.getConstructor(UserDAO.class);
+                        flag=1;
+                    } catch (NoSuchMethodException ignored){
+
+                    }
+                    try {
+                        constructor = c.getConstructor(ShowtimeDAO.class);
+                        flag=2;
+                    } catch (NoSuchMethodException ignored){
+
+                    }
+                    try {
+                        constructor = c.getConstructor(TicketDAO.class);
+                        flag=3;
+                    } catch (NoSuchMethodException ignored){
+
+                    }
+                    try {
+                        constructor = c.getConstructor(FilmDAO.class);
+                        flag=4;
+                    } catch (NoSuchMethodException ignored){
+
+                    }
+                    if(flag==0){
+                        throw  new RuntimeException();
+                    }
+                    if(flag==1){
+                        map.put(c, constructor.newInstance(userDAO));
+                    }
+                    if(flag==2){
+                        map.put(c, constructor.newInstance(showtimeDAO));
+                    }
+                    if(flag==3){
+                        map.put(c, constructor.newInstance(ticketDAO));
+                    }
+                    if(flag==4){
+                        map.put(c, constructor.newInstance(filmDAO));
+                    }
+
                 }
             }
         } catch (Exception exception) {

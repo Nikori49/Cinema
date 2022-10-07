@@ -1,22 +1,22 @@
 package com.epam.service;
 
 import com.epam.annotation.Service;
-import com.epam.dao.DBManager;
+import com.epam.dao.UserDAO;
 import com.epam.dao.entity.User;
 import com.epam.dao.exception.DBException;
 
 @Service
 public class UserService {
 
-    private final DBManager dbManager;
+    private final UserDAO userDAO;
 
-    public UserService(DBManager dbManager) {
-        this.dbManager = dbManager;
+    public UserService(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 
     public User findUserByEmail(String email){
         try {
-            return dbManager.findUserByEMail(email);
+            return userDAO.findUserByEMail(email);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -25,7 +25,7 @@ public class UserService {
 
     public User findUserByPhoneNumber(String phoneNumber){
         try {
-            return dbManager.findUserByPhoneNumber(phoneNumber);
+            return userDAO.findUserByPhoneNumber(phoneNumber);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -34,16 +34,16 @@ public class UserService {
 
     public User findUserByLogin(String login){
         try {
-            return dbManager.findUserByLogin(login);
+            return userDAO.findUserByLogin(login);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
     }
 
-    public User createUser(User user){
+    public void createUser(User user){
         try {
-            return dbManager.insertUser(user);
+            userDAO.insert(user);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -52,7 +52,7 @@ public class UserService {
 
     public User findUserById(Long id){
         try {
-            return dbManager.findUserById(id);
+            return userDAO.findById(id);
         }catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -61,7 +61,7 @@ public class UserService {
 
     public void updateBalance(Long id,Long balance){
         try {
-            dbManager.updateUserBalance(id,balance);
+            userDAO.updateUserBalance(id,balance);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -70,7 +70,7 @@ public class UserService {
 
     public Long getUserBalance(Long userId){
         try {
-         return dbManager.getUserBalance(userId);
+         return userDAO.getUserBalance(userId);
         }catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();

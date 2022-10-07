@@ -1,7 +1,5 @@
 package com.epam.servlet.ajax;
 
-import com.epam.dao.ConnectionPool;
-import com.epam.dao.DBManager;
 import com.epam.dao.entity.Film;
 import com.epam.service.FilmService;
 import org.junit.jupiter.api.Test;

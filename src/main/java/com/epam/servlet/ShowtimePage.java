@@ -3,6 +3,7 @@ package com.epam.servlet;
 import com.epam.dao.entity.Film;
 import com.epam.dao.entity.Showtime;
 import com.epam.dao.entity.User;
+import com.epam.dao.exception.DBException;
 import com.epam.service.FilmService;
 import com.epam.service.ShowtimeService;
 
@@ -60,7 +61,9 @@ public class ShowtimePage extends HttpServlet {
 
 
         Film film = null;
-        film = filmService.getFilm(showtime.getFilmId());
+
+            film = filmService.getFilm(showtime.getFilmId());
+
         TreeMap<String, String> seats = showtime.getSeats();
 
 

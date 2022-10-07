@@ -54,7 +54,7 @@ public class Utils {
      * Returns <code>List</code> of String object representing weekday indexes.
      *
      * @return <code>List</code> object
-     * @see User,DBManager
+     * @see User
      */
     public List<String> getWeekDays() {
         List<Date> dateList = getWeekDates();

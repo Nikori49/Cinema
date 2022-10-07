@@ -1,6 +1,5 @@
 package com.epam.servlet.command;
 
-import com.epam.dao.DBManager;
 import com.epam.dao.entity.Ticket;
 import com.epam.dao.entity.User;
 import com.epam.service.TicketService;
@@ -22,7 +21,7 @@ import static org.mockito.Mockito.when;
 public class RefundTicketCommandTest {
 
     @Test
-    public void refundTicketCommandTest() throws ServletException, IOException {
+    public void refundTicketCommandTest() {
 
         HttpSession session = mock(HttpSession.class);
         UserService userService = mock(UserService.class);

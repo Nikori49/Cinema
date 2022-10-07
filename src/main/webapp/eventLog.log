@@ -508,3 +508,14 @@
 2022-10-07 10:29:46 INFO  Controller:81 - redirect ==> addShowtime.jsp
 2022-10-07 10:30:24 INFO  Controller:69 - commandName ==> addShowtime
 2022-10-07 10:30:24 INFO  Controller:81 - redirect ==> manager.jsp
+2022-10-07 14:02:24 INFO  Controller:69 - commandName ==> login
+2022-10-07 14:02:24 INFO  Controller:81 - redirect ==> index.jsp
+2022-10-07 14:02:35 INFO  Controller:69 - commandName ==> purchaseTickets
+2022-10-07 14:02:35 INFO  Controller:81 - redirect ==> client.jsp
+2022-10-07 14:02:59 INFO  Controller:69 - commandName ==> login
+2022-10-07 14:02:59 INFO  Controller:81 - redirect ==> manager.jsp
+2022-10-07 14:03:24 INFO  Controller:53 - commandName ==> printStats
+2022-10-07 14:03:24 INFO  Controller:55 - loggedUser ==> Manager
+2022-10-07 14:03:24 INFO  Controller:57 - command ==> com.epam.servlet.command.PrintStatsCommand@33fa619a
+2022-10-07 14:03:24 INFO  Controller:58 - forward ==> manager.jsp
+2022-10-07 14:03:24 INFO  Controller:59 - ===============================================

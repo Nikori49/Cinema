@@ -133,6 +133,15 @@
     <c:forEach items="${thisWeekShowtimeList}" begin="${schedulePage}" end="${schedulePage}" var="showtimeList"
                varStatus="status">
 
+        <ul class="pagination">
+            <c:forEach items="${weekDays}" var="day" varStatus="status">
+                <li
+                        <c:if test="${schedulePage==status.index}">class="active" </c:if> ><a
+                        <c:if test="${schedulePage!=status.index}">href="schedule.jsp"
+                        onclick="changePage(${status.index})" </c:if> ><fmt:message key="label.day${day}"/></a></li>
+            </c:forEach>
+
+        </ul>
         <label for="table">
 
             <c:forEach items="${weekDays}" var="weekDay" varStatus="dayStatus">
@@ -182,15 +191,7 @@
             </c:forEach>
         </table>
     </c:forEach>
-    <ul class="pagination">
-        <c:forEach items="${weekDays}" var="day" varStatus="status">
-            <li
-                    <c:if test="${schedulePage==status.index}">class="active" </c:if> ><a
-                    <c:if test="${schedulePage!=status.index}">href="schedule.jsp"
-                    onclick="changePage(${status.index})" </c:if> ><fmt:message key="label.day${day}"/></a></li>
-        </c:forEach>
 
-    </ul>
 
 </div>
 </body>

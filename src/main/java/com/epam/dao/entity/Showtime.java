@@ -1,6 +1,6 @@
 package com.epam.dao.entity;
 
-import com.epam.dao.DBManager;
+
 
 import java.sql.Date;
 import java.sql.Time;
@@ -25,7 +25,7 @@ import java.util.TreeMap;
  *
  * @author Mykyta Ponomarenko
  * @version 1.0
- * @see DBManager
+ * @see com.epam.dao.ShowtimeDAO
  */
 public class Showtime extends Entity{
     Long id;

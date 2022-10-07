@@ -1,7 +1,8 @@
 package com.epam.service;
 
 import com.epam.annotation.Service;
-import com.epam.dao.DBManager;
+
+import com.epam.dao.ShowtimeDAO;
 import com.epam.dao.entity.Showtime;
 import com.epam.dao.exception.DBException;
 
@@ -10,15 +11,15 @@ import java.util.List;
 
 @Service
 public class ShowtimeService {
-    private final DBManager dbManager;
+    private final ShowtimeDAO showtimeDAO;
 
-    public ShowtimeService(DBManager dbManager) {
-        this.dbManager = dbManager;
+    public ShowtimeService(ShowtimeDAO showtimeDAO) {
+        this.showtimeDAO = showtimeDAO;
     }
 
     public void createShowtime(Showtime showtime){
         try {
-            dbManager.createShowTime(showtime);
+            showtimeDAO.insert(showtime);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -27,7 +28,7 @@ public class ShowtimeService {
 
     public List<Showtime> getShowtimeForDate(Date date){
         try {
-            return dbManager.getShowtimeForDate(date);
+            return showtimeDAO.getShowtimeForDate(date);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -36,7 +37,7 @@ public class ShowtimeService {
 
     public List<Showtime> getShowtimeForFilm(Long filmId){
         try {
-            return dbManager.getShowtimeForFilm(filmId);
+            return showtimeDAO.getShowtimeForFilm(filmId);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -45,7 +46,7 @@ public class ShowtimeService {
 
     public Showtime getShowtime(Long showtimeId){
         try {
-            return dbManager.getShowTime(showtimeId);
+            return showtimeDAO.findById(showtimeId);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -54,7 +55,7 @@ public class ShowtimeService {
 
     public void cancelShowtime(Long showtimeId){
         try {
-            dbManager.cancelShowtime(showtimeId);
+            showtimeDAO.cancelShowtime(showtimeId);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -63,7 +64,7 @@ public class ShowtimeService {
 
     public List<Showtime> getPlannedShowtime(){
         try {
-            return dbManager.getPlannedShowtimes();
+            return showtimeDAO.getPlannedShowtimes();
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -72,7 +73,7 @@ public class ShowtimeService {
 
     public String getSeatStatus(String seat,Long showtimeId){
         try {
-            return dbManager.getSeatStatus(seat,showtimeId);
+            return showtimeDAO.getSeatStatus(seat,showtimeId);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -81,7 +82,7 @@ public class ShowtimeService {
 
     public List<Showtime> getShowtimeForMonth(Date firstDay){
         try {
-            return dbManager.getShowtimesForMonth(firstDay);
+            return showtimeDAO.getShowtimesForMonth(firstDay);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -90,7 +91,7 @@ public class ShowtimeService {
 
     public List<List<Showtime>> getShowtimeForWeek(){
         try {
-            return dbManager.getShowtimesForWeek();
+            return showtimeDAO.getShowtimesForWeek();
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -99,7 +100,7 @@ public class ShowtimeService {
 
     public void finishPastShowtime(){
         try {
-            dbManager.updatePastShowtimeStatuses();
+            showtimeDAO.updatePastShowtimeStatuses();
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -108,7 +109,7 @@ public class ShowtimeService {
 
     public void updateSeatStatus(Long showtimeId,String seat,String status){
         try {
-            dbManager.updateSeatStatus(showtimeId,seat,status);
+            showtimeDAO.updateSeatStatus(showtimeId,seat,status);
         } catch (DBException e) {
             e.printStackTrace();
             throw new RuntimeException();

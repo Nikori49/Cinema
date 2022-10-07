@@ -1,8 +1,5 @@
 package com.epam.dao;
 
-import com.epam.dao.ConnectionPool;
-import com.epam.dao.DBManager;
-import com.epam.dao.Utils;
 import com.epam.dao.entity.Film;
 import com.epam.dao.entity.Showtime;
 import com.epam.dao.entity.Ticket;
@@ -28,19 +25,46 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DBManagerTest {
+    public static final String GET_USER_BY_LOGIN = "SELECT * FROM users WHERE login=?";
+    public static final String GET_USER_BY_EMAIL = "SELECT * FROM users WHERE email=?";
+    public static final String GET_USER_BY_PHONE_NUMBER = "SELECT * FROM users WHERE phone_number=?";
+    public static final String GET_USER_BY_ID = "SELECT * FROM users WHERE id=?";
+    public static final String INSERT_USER = "INSERT INTO users VALUES (DEFAULT,?,?,?,?,?,md5(?),'client',0)";
+    public static final String UPDATE_USER_BALANCE = "UPDATE users SET balance=balance+? WHERE id=?";
+    public static final String GET_SHOWTIME_BY_DATE = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.date=? ORDER BY show_times.id";
+    public static final String GET_SHOWTIME_BY_FILM_ID = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.filmId=? ORDER BY show_times.id";
+    public static final String GET_SHOWTIME_BY_ID = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.id=? ORDER BY show_times.id";
+    public static final String CANCEL_SHOWTIME_BY_ID = "UPDATE cinema.show_times SET status='canceled' WHERE show_times.id=?";
+    public static final String GET_SHOWTIMES_FOR_MONTH = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId  WHERE show_times.date>=? AND show_times.date<=? ORDER BY show_times.id";
+    public static final String GET_SHOWTIMES_FOR_WEEK = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId WHERE show_times.date=? AND show_times.status='planned' ORDER BY show_times.id";
+    public static final String UPDATE_PAST_SHOWTIMES = "UPDATE show_times SET status = 'finished' WHERE NOT status = 'canceled' and (date<? OR (date = ? AND endTime < ?))";
+    public static final String GET_PLANNED_SHOWTIMES = "SELECT * FROM show_times join  seats ON show_times.id=seats.showtimeId  ORDER BY show_times.id";
+    public static final String UPDATE_SEAT_STATUS = "UPDATE seats SET status=? WHERE seat=? AND showtimeId=?";
+    public static final String INSERT_SHOWTIME = "INSERT INTO show_times VALUES (DEFAULT,?,?,?,?,?)";
+    public static final String INSERT_SEATS = "INSERT INTO seats VALUES (DEFAULT,?,?,'vacant')";
+    public static final String GET_SEAT_STATUS = "SELECT * FROM seats WHERE seat=? AND showtimeId=?";
+    public static final String INSERT_FILM = "INSERT INTO films values (DEFAULT,?,?,?,?,?,?,?)";
+    public static final String GET_FILM_BY_ID = "SELECT * FROM films WHERE id=?";
+    public static final String GET_ALL_FILMS = "SELECT * FROM films";
+    public static final String INSERT_TICKET = "INSERT INTO tickets VALUES (DEFAULT,?,?,?,'purchased')";
+    public static final String GET_TICKET_BY_ID = "SELECT * FROM tickets WHERE id=?";
+    public static final String GET_USERS_TICKETS = "SELECT * FROM tickets WHERE userId=?";
+    public static final String GET_SHOWTIME_TICKETS = "SELECT * FROM tickets WHERE showTimeId=?";
+    public static final String UPDATE_TICKET_STATUS = "UPDATE tickets SET status=? where id=?";
+
     @Test
     public void findUserByEmailTest() throws SQLException, DBException {
         ConnectionPool connectionPool = mock(ConnectionPool.class);
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_USER_BY_EMAIL;
+        String statement = GET_USER_BY_EMAIL;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        UserDAO userDAO = new UserDAO(connectionPool);
 
-        UserService userService = new UserService(dbManager);
+        UserService userService = new UserService(userDAO);
 
         User user = new User();
         user.setId(1L);
@@ -82,13 +106,13 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_USER_BY_LOGIN;
+        String statement = GET_USER_BY_LOGIN;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        UserDAO userDAO = new UserDAO(connectionPool);
 
-        UserService userService = new UserService(dbManager);
+        UserService userService = new UserService(userDAO);
 
         User user = new User();
         user.setId(1L);
@@ -125,13 +149,13 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_USER_BY_PHONE_NUMBER;
+        String statement = GET_USER_BY_PHONE_NUMBER;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        UserDAO userDAO = new UserDAO(connectionPool);
 
-        UserService userService = new UserService(dbManager);
+        UserService userService = new UserService(userDAO);
 
         User user = new User();
         user.setId(1L);
@@ -168,13 +192,13 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.INSERT_USER;
+        String statement = INSERT_USER;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement,Statement.RETURN_GENERATED_KEYS))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        UserDAO userDAO = new UserDAO(connectionPool);
 
-        UserService userService = new UserService(dbManager);
+        UserService userService = new UserService(userDAO);
 
         User user = new User();
         user.setId(1L);
@@ -198,7 +222,7 @@ public class DBManagerTest {
                 .thenReturn(resultSet);
 
 
-        Assertions.assertEquals(user, userService.createUser(user));
+        Assertions.assertDoesNotThrow(()->userService.createUser(user));
     }
 
     @Test
@@ -207,18 +231,16 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement1 = DBManager.INSERT_SHOWTIME;
-        String statement2 = DBManager.INSERT_SEATS;
         PreparedStatement preparedStatement1 = mock(PreparedStatement.class);
         PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement1,Statement.RETURN_GENERATED_KEYS))
+        when(connection.prepareStatement(INSERT_SHOWTIME,Statement.RETURN_GENERATED_KEYS))
                 .thenReturn(preparedStatement1);
-        when(connection.prepareStatement(statement2))
+        when(connection.prepareStatement(INSERT_SEATS))
                 .thenReturn(preparedStatement2);
-        DBManager dbManager = new DBManager(connectionPool);
 
+        ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
 
 
 
@@ -251,13 +273,15 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_SHOWTIME_BY_DATE;
+        String statement = GET_SHOWTIME_BY_DATE;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
+
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
+
 
         Showtime showtime1 = new Showtime();
         showtime1.setDate(Date.valueOf("2022-08-12"));
@@ -365,13 +389,14 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_SHOWTIME_BY_FILM_ID;
+        String statement = GET_SHOWTIME_BY_FILM_ID;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
+
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
 
 
         Showtime showtime1 = new Showtime();
@@ -480,13 +505,14 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_SHOWTIME_BY_ID;
+        String statement = GET_SHOWTIME_BY_ID;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
+
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
 
 
         Showtime showtime1 = new Showtime();
@@ -598,29 +624,25 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.CANCEL_SHOWTIME_BY_ID;
-        String statement1 = DBManager.GET_SHOWTIME_BY_ID;
-        String statement2 = DBManager.GET_SHOWTIME_TICKETS;
-        String statement3 = DBManager.UPDATE_USER_BALANCE;
-        String statement4 = DBManager.UPDATE_TICKET_STATUS;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         PreparedStatement preparedStatement1 = mock(PreparedStatement.class);
         PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
         PreparedStatement preparedStatement3 = mock(PreparedStatement.class);
         PreparedStatement preparedStatement4 = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement))
+        when(connection.prepareStatement(CANCEL_SHOWTIME_BY_ID))
                 .thenReturn(preparedStatement);
-        when(connection.prepareStatement(statement1))
+        when(connection.prepareStatement(GET_SHOWTIME_BY_ID))
                 .thenReturn(preparedStatement1);
-        when(connection.prepareStatement(statement2))
+        when(connection.prepareStatement(GET_SHOWTIME_TICKETS))
                 .thenReturn(preparedStatement2);
-        when(connection.prepareStatement(statement3))
+        when(connection.prepareStatement(UPDATE_USER_BALANCE))
                 .thenReturn(preparedStatement3);
-        when(connection.prepareStatement(statement4))
+        when(connection.prepareStatement(UPDATE_TICKET_STATUS))
                 .thenReturn(preparedStatement4);
-        DBManager dbManager = new DBManager(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
+
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
 
 
         Showtime showtime1 = new Showtime();
@@ -740,13 +762,12 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.INSERT_FILM;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement))
+        when(connection.prepareStatement(INSERT_FILM))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        FilmDAO filmDAO = new FilmDAO(connectionPool);
 
-        FilmService filmService = new FilmService(dbManager);
+        FilmService filmService = new FilmService(filmDAO);
 
 
         Film film = new Film();
@@ -764,20 +785,18 @@ public class DBManagerTest {
     }
 
     @Test
-    public void getFilmTest() throws SQLException {
+    public void getFilmTest() throws SQLException, DBException {
         ConnectionPool connectionPool = mock(ConnectionPool.class);
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_FILM_BY_ID;
+        String statement = GET_FILM_BY_ID;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        FilmDAO filmDAO = new FilmDAO(connectionPool);
 
-        FilmService filmService = new FilmService(dbManager);
-
-
+        FilmService filmService = new FilmService(filmDAO);
         Film film = new Film();
         film.setId(1L);
         film.setPosterImgPath("susPath");
@@ -816,14 +835,12 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_ALL_FILMS;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement))
+        when(connection.prepareStatement(GET_ALL_FILMS))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        FilmDAO filmDAO = new FilmDAO(connectionPool);
 
-        FilmService filmService = new FilmService(dbManager);
-
+        FilmService filmService = new FilmService(filmDAO);
 
         Film film = new Film();
         film.setId(1L);
@@ -875,21 +892,19 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement1 = DBManager.INSERT_TICKET;
-        String statement2 = DBManager.UPDATE_SEAT_STATUS;
-        String statement3 = DBManager.UPDATE_USER_BALANCE;
         PreparedStatement preparedStatement1 = mock(PreparedStatement.class);
         PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
         PreparedStatement preparedStatement3 = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement1))
+        when(connection.prepareStatement(INSERT_TICKET))
                 .thenReturn(preparedStatement1);
-        when(connection.prepareStatement(statement2))
+        when(connection.prepareStatement(UPDATE_SEAT_STATUS))
                 .thenReturn(preparedStatement2);
-        when(connection.prepareStatement(statement3))
+        when(connection.prepareStatement(UPDATE_USER_BALANCE))
                 .thenReturn(preparedStatement3);
-        DBManager dbManager = new DBManager(connectionPool);
 
-        TicketService ticketService = new TicketService(dbManager);
+        TicketDAO ticketDAO = new TicketDAO(connectionPool);
+
+        TicketService ticketService = new TicketService(ticketDAO);
 
         Ticket ticket = new Ticket();
         ticket.setSeat("A1");
@@ -907,17 +922,16 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement1 = DBManager.GET_TICKET_BY_ID;
 
         PreparedStatement preparedStatement1 = mock(PreparedStatement.class);
 
-        when(connection.prepareStatement(statement1))
+        when(connection.prepareStatement(GET_TICKET_BY_ID))
                 .thenReturn(preparedStatement1);
 
-        DBManager dbManager = new DBManager(connectionPool);
 
-        TicketService ticketService = new TicketService(dbManager);
+        TicketDAO ticketDAO = new TicketDAO(connectionPool);
 
+        TicketService ticketService = new TicketService(ticketDAO);
 
         Ticket ticket = new Ticket();
         ticket.setSeat("A1");
@@ -951,16 +965,16 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement1 = DBManager.GET_USERS_TICKETS;
 
         PreparedStatement preparedStatement1 = mock(PreparedStatement.class);
 
-        when(connection.prepareStatement(statement1))
+        when(connection.prepareStatement(GET_USERS_TICKETS))
                 .thenReturn(preparedStatement1);
 
-        DBManager dbManager = new DBManager(connectionPool);
 
-        TicketService ticketService = new TicketService(dbManager);
+        TicketDAO ticketDAO = new TicketDAO(connectionPool);
+
+        TicketService ticketService = new TicketService(ticketDAO);
 
 
         Ticket ticket = new Ticket();
@@ -1012,13 +1026,12 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_PLANNED_SHOWTIMES;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement))
+        when(connection.prepareStatement(GET_PLANNED_SHOWTIMES))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+       ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
 
         Showtime showtime1 = new Showtime();
         showtime1.setDate(Date.valueOf("2022-08-12"));
@@ -1126,13 +1139,12 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_SEAT_STATUS;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement))
+        when(connection.prepareStatement(GET_SEAT_STATUS))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
 
         Showtime showtime1 = new Showtime();
         showtime1.setDate(Date.valueOf("2022-08-12"));
@@ -1178,13 +1190,12 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_SHOWTIMES_FOR_MONTH;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement))
+        when(connection.prepareStatement(GET_SHOWTIMES_FOR_MONTH))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+       ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
 
         Showtime showtime1 = new Showtime();
         showtime1.setDate(Date.valueOf("2222-08-12"));
@@ -1292,13 +1303,12 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.GET_SHOWTIMES_FOR_WEEK;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement))
+        when(connection.prepareStatement(GET_SHOWTIMES_FOR_WEEK))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
 
         Showtime showtime1 = new Showtime();
         showtime1.setDate(Date.valueOf("2022-08-12"));
@@ -1415,13 +1425,12 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.UPDATE_PAST_SHOWTIMES;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(connection.prepareStatement(statement))
+        when(connection.prepareStatement(UPDATE_PAST_SHOWTIMES))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        ShowtimeDAO showtimeDAO = new ShowtimeDAO(connectionPool);
 
-        ShowtimeService showtimeService = new ShowtimeService(dbManager);
+        ShowtimeService showtimeService = new ShowtimeService(showtimeDAO);
 
 
         Assertions.assertDoesNotThrow(showtimeService::finishPastShowtime);
@@ -1433,13 +1442,13 @@ public class DBManagerTest {
         Connection connection = mock(Connection.class);
         when(connectionPool.getConnection())
                 .thenReturn(connection);
-        String statement = DBManager.UPDATE_USER_BALANCE;
+        String statement = UPDATE_USER_BALANCE;
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(statement))
                 .thenReturn(preparedStatement);
-        DBManager dbManager = new DBManager(connectionPool);
+        UserDAO userDAO = new UserDAO(connectionPool);
 
-        UserService userService = new UserService(dbManager);
+        UserService userService = new UserService(userDAO);
 
 
         Assertions.assertDoesNotThrow(() -> userService.updateBalance(1L, 75L));

@@ -3,6 +3,7 @@ package com.epam.servlet.command;
 import com.epam.annotation.MyInject;
 import com.epam.dao.entity.Film;
 import com.epam.dao.entity.Showtime;
+import com.epam.dao.exception.DBException;
 import com.epam.service.ShowtimeService;
 import com.epam.service.FilmService;
 
@@ -34,7 +35,7 @@ public class AddShowtimeCommand implements Command {
     }
 
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public String execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, DBException {
 
         String address = "manager.jsp";
         String filmString = request.getParameter("film");
@@ -100,17 +101,7 @@ public class AddShowtimeCommand implements Command {
         showtime.setId(0L);
         showtimeService.createShowtime(showtime);
 
-        /*try {
-            request.getServletContext().setAttribute("showtimeList", DBManager.getInstance().getPlannedShowtimes());
-        } catch (DBException e) {
-            return "error.jsp";
-        }
-        try {
-            request.getServletContext().setAttribute("thisWeekShowtimeList", DBManager.getInstance().getShowtimesForWeek());
-        } catch (DBException e) {
-            return "error.jsp";
-        }
-*/
+
 
         return address;
     }
